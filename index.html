@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>日文學習記錄 · N4</title>
+<style>
+  :root {
+    --bg: #f5f3ef;
+    --card: #ffffff;
+    --text: #2b2b2b;
+    --muted: #7a7671;
+    --accent: #d4573f;
+    --accent-soft: #fbe9e4;
+    --border: #e5e0d8;
+    --tag-bg: #efece6;
+    --reading: #9a938a;
+    --grammar-bg: #eef4f0;
+    --grammar-accent: #4a8c6f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1b1a18;
+      --card: #262421;
+      --text: #e8e4dd;
+      --muted: #9a938a;
+      --accent: #e8735c;
+      --accent-soft: #3a2a26;
+      --border: #38352f;
+      --tag-bg: #322f2a;
+      --reading: #8a837a;
+      --grammar-bg: #21302a;
+      --grammar-accent: #6bbd97;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Hiragino Sans", "Noto Sans TC", "PingFang TC", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 0 16px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  header {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 28px 4px 16px;
+  }
+  h1 { font-size: 1.5rem; letter-spacing: 0.5px; }
+  h1 .jp { color: var(--accent); }
+  .sub { color: var(--muted); font-size: 0.85rem; margin-top: 4px; }
+  .controls {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    max-width: 760px; margin: 0 auto;
+    padding: 12px 0;
+  }
+  #search {
+    width: 100%; padding: 12px 16px;
+    font-size: 1rem; border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--card); color: var(--text);
+    outline: none;
+  }
+  #search:focus { border-color: var(--accent); }
+  .tags-bar {
+    display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+  }
+  .tag-filter {
+    font-size: 0.78rem; padding: 4px 11px; border-radius: 999px;
+    background: var(--tag-bg); color: var(--muted);
+    border: 1px solid transparent; cursor: pointer; user-select: none;
+  }
+  .tag-filter.active { background: var(--accent); color: #fff; }
+  .stats { color: var(--muted); font-size: 0.8rem; margin: 6px 2px 0; }
+  main { max-width: 760px; margin: 0 auto; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px; margin-top: 16px;
+  }
+  .card-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; margin-bottom: 12px;
+  }
+  .meta { font-size: 0.75rem; color: var(--muted); }
+  .meta .src { color: var(--accent); font-weight: 600; }
+  .original {
+    font-size: 1.3rem; font-weight: 600; line-height: 1.55;
+  }
+  ruby rt { color: var(--reading); font-size: 0.55em; }
+  .reading { color: var(--reading); font-size: 0.85rem; margin-top: 2px; }
+  .translation {
+    margin-top: 10px; padding-left: 12px;
+    border-left: 3px solid var(--accent); color: var(--text);
+  }
+  .section-label {
+    font-size: 0.72rem; color: var(--muted); letter-spacing: 1px;
+    text-transform: uppercase; margin: 16px 0 6px;
+  }
+  .word-row {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline;
+    padding: 5px 0; border-bottom: 1px dashed var(--border);
+  }
+  .word-row:last-child { border-bottom: none; }
+  .w-jp { font-weight: 600; }
+  .w-reading { color: var(--reading); font-size: 0.82rem; }
+  .w-pos {
+    font-size: 0.68rem; background: var(--tag-bg); color: var(--muted);
+    padding: 1px 7px; border-radius: 6px;
+  }
+  .w-mean { color: var(--text); font-size: 0.92rem; }
+  .grammar {
+    background: var(--grammar-bg); border-radius: 12px;
+    padding: 12px 14px; margin-top: 8px;
+  }
+  .g-point {
+    font-weight: 700; color: var(--grammar-accent);
+    font-size: 0.98rem; margin-bottom: 4px;
+  }
+  .g-explain { font-size: 0.92rem; }
+  .note {
+    margin-top: 12px; font-size: 0.85rem; color: var(--muted);
+    font-style: italic;
+  }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+  .card-tag {
+    font-size: 0.72rem; padding: 2px 9px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent); cursor: pointer;
+  }
+  .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+  footer { max-width: 760px; margin: 40px auto 0; color: var(--muted); font-size: 0.75rem; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="jp">日本語</span> 學習記錄 <span style="font-size:0.7rem;color:var(--muted);">N4</span></h1>
+  <div class="sub">透過小說・遊戲累積的句子・單字・文法</div>
+</header>
+
+<div class="controls">
+  <input id="search" type="search" placeholder="🔍 搜尋原文 / 中文 / 單字 / 文法…">
+  <div class="tags-bar" id="tagsBar"></div>
+  <div class="stats" id="stats"></div>
+</div>
+
+<main id="list"></main>
+<footer>資料來源：data.json ・ 每次學到新句子就會自動更新</footer>
+
+<script>
+let ENTRIES = [];
+let activeTag = null;
+let query = "";
+
+async function load() {
+  try {
+    const res = await fetch("data.json?_=" + Date.now());
+    const data = await res.json();
+    ENTRIES = (data.entries || []).slice().reverse(); // 最新在上
+  } catch (e) {
+    document.getElementById("list").innerHTML =
+      '<div class="empty">無法載入 data.json<br>' + e + '</div>';
+    return;
+  }
+  renderTags();
+  render();
+}
+
+function allTags() {
+  const s = new Set();
+  ENTRIES.forEach(e => (e.tags || []).forEach(t => s.add(t)));
+  return [...s].sort();
+}
+
+function renderTags() {
+  const bar = document.getElementById("tagsBar");
+  const tags = allTags();
+  bar.innerHTML = "";
+  tags.forEach(t => {
+    const el = document.createElement("span");
+    el.className = "tag-filter" + (activeTag === t ? " active" : "");
+    el.textContent = "#" + t;
+    el.onclick = () => { activeTag = (activeTag === t ? null : t); renderTags(); render(); };
+    bar.appendChild(el);
+  });
+}
+
+function matches(e) {
+  if (activeTag && !(e.tags || []).includes(activeTag)) return false;
+  if (!query) return true;
+  const q = query.toLowerCase();
+  const hay = [
+    e.original, e.reading, e.translation, e.source, e.note,
+    ...(e.tags || []),
+    ...(e.words || []).flatMap(w => [w.word, w.reading, w.meaning]),
+    ...(e.grammar || []).flatMap(g => [g.point, g.explain])
+  ].join(" ").toLowerCase();
+  return hay.includes(q);
+}
+
+function esc(s) {
+  return (s || "").replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+
+function render() {
+  const list = document.getElementById("list");
+  const filtered = ENTRIES.filter(matches);
+  document.getElementById("stats").textContent =
+    `共 ${ENTRIES.length} 筆記錄` + (filtered.length !== ENTRIES.length ? `，符合 ${filtered.length} 筆` : "");
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">找不到符合的記錄</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(cardHTML).join("");
+  list.querySelectorAll(".card-tag").forEach(el => {
+    el.onclick = () => { activeTag = el.dataset.tag; renderTags(); render(); window.scrollTo({top:0,behavior:"smooth"}); };
+  });
+}
+
+function cardHTML(e) {
+  const words = (e.words || []).map(w => `
+    <div class="word-row">
+      <span class="w-jp">${esc(w.word)}</span>
+      ${w.reading && w.reading !== w.word ? `<span class="w-reading">${esc(w.reading)}</span>` : ""}
+      ${w.pos ? `<span class="w-pos">${esc(w.pos)}</span>` : ""}
+      <span class="w-mean">${esc(w.meaning)}</span>
+    </div>`).join("");
+  const grammar = (e.grammar || []).map(g => `
+    <div class="grammar">
+      <div class="g-point">${esc(g.point)}</div>
+      <div class="g-explain">${esc(g.explain)}</div>
+    </div>`).join("");
+  const tags = (e.tags || []).map(t =>
+    `<span class="card-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("");
+  return `
+  <div class="card">
+    <div class="card-top">
+      <div class="meta"><span class="src">${esc(e.source || "—")}</span> · ${esc(e.date || "")}</div>
+      <div class="meta">${e.type === "word" ? "單字" : "句子"}</div>
+    </div>
+    <div class="original">${esc(e.original)}</div>
+    ${e.reading ? `<div class="reading">${esc(e.reading)}</div>` : ""}
+    ${e.translation ? `<div class="translation">${esc(e.translation)}</div>` : ""}
+    ${words ? `<div class="section-label">單字拆解</div>${words}` : ""}
+    ${grammar ? `<div class="section-label">文法・句型</div>${grammar}` : ""}
+    ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
+    ${tags ? `<div class="card-tags">${tags}</div>` : ""}
+  </div>`;
+}
+
+document.getElementById("search").addEventListener("input", ev => {
+  query = ev.target.value.trim();
+  render();
+});
+
+load();
+</script>
+</body>
+</html>
