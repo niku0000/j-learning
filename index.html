@@ -130,6 +130,59 @@
   }
   .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
   footer { max-width: 760px; margin: 40px auto 0; color: var(--muted); font-size: 0.75rem; text-align: center; }
+
+  /* 切換鈕 */
+  .work-toggle {
+    position: fixed; right: 14px; bottom: 14px; z-index: 50;
+    font-size: 0.72rem; padding: 6px 12px; border-radius: 999px;
+    background: var(--card); color: var(--muted);
+    border: 1px solid var(--border); cursor: pointer; opacity: 0.55;
+  }
+  .work-toggle:hover { opacity: 1; }
+
+  /* ===== 摸魚模式（WORK）：純黑白、樸素文件排版 ===== */
+  body.work {
+    background: #ffffff; color: #202020;
+    font-family: "Segoe UI", -apple-system, "Noto Sans TC", Arial, sans-serif;
+    font-size: 13px; line-height: 1.5; padding: 0 24px 40px;
+  }
+  body.work header .sub, body.work footer { display: none; }
+  body.work h1 { font-size: 0.95rem; font-weight: 600; color: #202020; letter-spacing: 0; }
+  body.work h1 .jp, body.work h1 span { color: #202020 !important; font-size: 0.95rem !important; }
+  body.work header { padding: 14px 4px 6px; border-bottom: 1px solid #d9d9d9; }
+  body.work .controls { background: #fff; padding: 8px 0; }
+  body.work #search {
+    border-radius: 3px; border: 1px solid #c8c8c8; background: #fff;
+    color: #202020; font-size: 0.85rem; padding: 6px 10px;
+  }
+  body.work #search:focus { border-color: #808080; }
+  body.work .tags-bar { gap: 4px; margin-top: 6px; }
+  body.work .tag-filter {
+    border-radius: 3px; background: #f0f0f0; color: #555;
+    border: 1px solid #dcdcdc; font-size: 0.72rem;
+  }
+  body.work .tag-filter.active { background: #555; color: #fff; border-color: #555; }
+  body.work .stats { color: #808080; }
+  body.work .card {
+    background: #fff; border: none; border-bottom: 1px solid #e2e2e2;
+    border-radius: 0; padding: 12px 0; margin-top: 0;
+  }
+  body.work .card-top { margin-bottom: 6px; }
+  body.work .meta, body.work .meta .src { color: #909090; }
+  body.work .meta .src { font-weight: 400; }
+  body.work .original { font-size: 1rem; font-weight: 600; color: #202020; }
+  body.work .reading, body.work .w-reading, body.work ruby rt { color: #999; }
+  body.work .translation { border-left: 2px solid #c8c8c8; color: #404040; }
+  body.work .section-label { color: #a0a0a0; margin: 10px 0 4px; }
+  body.work .w-pos { background: #f0f0f0; color: #777; border-radius: 2px; }
+  body.work .grammar { background: #f6f6f6; border-radius: 3px; padding: 8px 10px; }
+  body.work .g-point { color: #303030; font-weight: 600; }
+  body.work .g-explain { color: #404040; }
+  body.work .card-tag { background: #f0f0f0; color: #777; border-radius: 2px; }
+  body.work .note { color: #999; }
+  body.work .work-toggle {
+    background: #fff; color: #999; border: 1px solid #d0d0d0; opacity: 0.4;
+  }
 </style>
 </head>
 <body>
@@ -146,6 +199,8 @@
 
 <main id="list"></main>
 <footer>資料來源：data.json ・ 每次學到新句子就會自動更新</footer>
+
+<button class="work-toggle" id="workToggle" title="切換摸魚模式（快捷鍵：Esc）">摸魚模式</button>
 
 <script>
 let ENTRIES = [];
@@ -252,6 +307,20 @@ document.getElementById("search").addEventListener("input", ev => {
   query = ev.target.value.trim();
   render();
 });
+
+// ===== 摸魚模式 =====
+const workBtn = document.getElementById("workToggle");
+function applyWork(on) {
+  document.body.classList.toggle("work", on);
+  document.title = on ? "文件" : "日文學習記錄 · N4";
+  workBtn.textContent = on ? "一般模式" : "摸魚模式";
+  localStorage.setItem("workMode", on ? "1" : "0");
+}
+workBtn.onclick = () => applyWork(!document.body.classList.contains("work"));
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") applyWork(!document.body.classList.contains("work"));
+});
+applyWork(localStorage.getItem("workMode") === "1");
 
 load();
 </script>
