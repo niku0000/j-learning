@@ -140,52 +140,100 @@
   }
   .work-toggle:hover { opacity: 1; }
 
-  /* ===== 摸魚模式（WORK）：純黑白、樸素文件排版 ===== */
+  /* 偽 Excel 外框（預設隱藏） */
+  .xl-chrome { display: none; }
+
+  /* ===== 摸魚模式（WORK）：偽 Excel 試算表 ===== */
   body.work {
-    background: #ffffff; color: #202020;
-    font-family: "Segoe UI", -apple-system, "Noto Sans TC", Arial, sans-serif;
-    font-size: 13px; line-height: 1.5; padding: 0 24px 40px;
+    background: #ffffff; color: #217346;
+    font-family: "Segoe UI", "Calibri", -apple-system, "Noto Sans TC", Arial, sans-serif;
+    font-size: 12px; line-height: 1.45; padding: 0;
+    color: #1f1f1f;
   }
   body.work header .sub, body.work footer { display: none; }
-  body.work h1 { font-size: 0.95rem; font-weight: 600; color: #202020; letter-spacing: 0; }
-  body.work h1 .jp, body.work h1 span { color: #202020 !important; font-size: 0.95rem !important; }
-  body.work header { padding: 14px 4px 6px; border-bottom: 1px solid #d9d9d9; }
-  body.work .controls { background: #fff; padding: 8px 0; }
+  body.work h1 { display: none; }
+
+  /* Excel 頂部外框 */
+  body.work .xl-chrome { display: block; position: sticky; top: 0; z-index: 20; }
+  .xl-titlebar {
+    display: flex; align-items: center; gap: 10px;
+    background: #217346; color: #fff; padding: 5px 12px; font-size: 12px;
+  }
+  .xl-logo {
+    background: #fff; color: #217346; font-weight: 800;
+    width: 18px; height: 18px; border-radius: 3px;
+    display: inline-flex; align-items: center; justify-content: center; font-size: 13px;
+  }
+  .xl-filename { font-weight: 600; }
+  .xl-menu { color: #cfe6d9; font-size: 11px; margin-left: 6px; }
+  .xl-colrow {
+    display: flex; background: #f3f3f3; border-bottom: 1px solid #d0d0d0;
+    color: #666; font-size: 11px;
+  }
+  .xl-colrow .xl-cell {
+    flex: 1; text-align: center; padding: 2px 0;
+    border-right: 1px solid #e0e0e0;
+  }
+  .xl-colrow .xl-corner {
+    flex: 0 0 34px; background: #e9e9e9; border-right: 1px solid #d0d0d0;
+  }
+
+  body.work header { padding: 0; border: none; }
+  body.work .controls {
+    background: #fff; padding: 4px 8px; max-width: none;
+    border-bottom: 1px solid #d0d0d0;
+    display: flex; align-items: center; gap: 8px;
+  }
   body.work #search {
-    border-radius: 3px; border: 1px solid #c8c8c8; background: #fff;
-    color: #202020; font-size: 0.85rem; padding: 6px 10px;
+    border-radius: 2px; border: 1px solid #c8c8c8; background: #fff;
+    color: #202020; font-size: 12px; padding: 3px 8px; max-width: 260px;
   }
-  body.work #search:focus { border-color: #808080; }
-  body.work .tags-bar { gap: 4px; margin-top: 6px; }
+  body.work #search:focus { border-color: #217346; }
+  body.work .tags-bar { gap: 3px; margin: 0; flex: 1; }
   body.work .tag-filter {
-    border-radius: 3px; background: #f0f0f0; color: #555;
-    border: 1px solid #dcdcdc; font-size: 0.72rem;
+    border-radius: 2px; background: #f0f0f0; color: #555;
+    border: 1px solid #dcdcdc; font-size: 11px; padding: 2px 8px;
   }
-  body.work .tag-filter.active { background: #555; color: #fff; border-color: #555; }
-  body.work .stats { color: #808080; }
+  body.work .tag-filter.active { background: #217346; color: #fff; border-color: #217346; }
+  body.work .stats { color: #808080; margin: 0; white-space: nowrap; }
+
+  body.work main { max-width: none; margin: 0; }
+  /* 每筆記錄 = 一列儲存格 */
   body.work .card {
-    background: #fff; border: none; border-bottom: 1px solid #e2e2e2;
-    border-radius: 0; padding: 12px 0; margin-top: 0;
+    background: #fff; border: none; border-bottom: 1px solid #dcdcdc;
+    border-radius: 0; padding: 8px 12px; margin: 0;
   }
-  body.work .card-top { margin-bottom: 6px; }
-  body.work .meta, body.work .meta .src { color: #909090; }
-  body.work .meta .src { font-weight: 400; }
-  body.work .original { font-size: 1rem; font-weight: 600; color: #202020; }
+  body.work main .card:nth-child(even) { background: #f7faf8; }
+  body.work .card-top { margin-bottom: 4px; }
+  body.work .meta, body.work .meta .src { color: #909090; font-weight: 400; }
+  body.work .original { font-size: 13px; font-weight: 600; color: #202020; }
   body.work .reading, body.work .w-reading, body.work ruby rt { color: #999; }
-  body.work .translation { border-left: 2px solid #c8c8c8; color: #404040; }
-  body.work .section-label { color: #a0a0a0; margin: 10px 0 4px; }
-  body.work .w-pos { background: #f0f0f0; color: #777; border-radius: 2px; }
-  body.work .grammar { background: #f6f6f6; border-radius: 3px; padding: 8px 10px; }
-  body.work .g-point { color: #303030; font-weight: 600; }
+  body.work .translation { border-left: 2px solid #c8c8c8; color: #404040; padding-left: 8px; margin-top: 4px; }
+  body.work .section-label { color: #a0a0a0; margin: 8px 0 3px; letter-spacing: 0.5px; }
+  body.work .word-row { padding: 3px 0; }
+  body.work .w-pos { background: #eef3ef; color: #777; border-radius: 2px; }
+  body.work .grammar { background: #f4f7f5; border-radius: 2px; padding: 6px 9px; }
+  body.work .g-point { color: #217346; font-weight: 600; }
   body.work .g-explain { color: #404040; }
-  body.work .card-tag { background: #f0f0f0; color: #777; border-radius: 2px; }
+  body.work .card-tags { margin-top: 8px; }
+  body.work .card-tag { background: #eef3ef; color: #557; border-radius: 2px; }
   body.work .note { color: #999; }
   body.work .work-toggle {
-    background: #fff; color: #999; border: 1px solid #d0d0d0; opacity: 0.4;
+    background: #fff; color: #999; border: 1px solid #d0d0d0; opacity: 0.35;
   }
 </style>
 </head>
 <body>
+<!-- 摸魚模式：偽 Excel 外框（一般模式隱藏） -->
+<div class="xl-chrome" id="xlChrome">
+  <div class="xl-titlebar">
+    <span class="xl-logo">X</span>
+    <span class="xl-filename" id="xlFilename">工作紀錄_2026Q3.xlsx</span>
+    <span class="xl-menu">檔案　常用　插入　頁面配置　公式　資料　校閱　檢視</span>
+  </div>
+  <div class="xl-colrow" id="xlCols"></div>
+</div>
+
 <header>
   <h1><span class="jp">日本語</span> 學習記錄 <span style="font-size:0.7rem;color:var(--muted);">N4</span></h1>
   <div class="sub">透過小說・遊戲累積的句子・單字・文法</div>
@@ -308,11 +356,19 @@ document.getElementById("search").addEventListener("input", ev => {
   render();
 });
 
-// ===== 摸魚模式 =====
+// ===== 摸魚模式（偽 Excel） =====
 const workBtn = document.getElementById("workToggle");
+const WORK_TITLE = "工作紀錄_2026Q3.xlsx - Excel";
+// 建立欄位字母列 A B C ...
+(function buildCols() {
+  const wrap = document.getElementById("xlCols");
+  let html = '<div class="xl-cell xl-corner"></div>';
+  for (const c of "ABCDEFGHIJKLMN") html += '<div class="xl-cell">' + c + '</div>';
+  wrap.innerHTML = html;
+})();
 function applyWork(on) {
   document.body.classList.toggle("work", on);
-  document.title = on ? "文件" : "日文學習記錄 · N4";
+  document.title = on ? WORK_TITLE : "日文學習記錄 · N4";
   workBtn.textContent = on ? "一般模式" : "摸魚模式";
   localStorage.setItem("workMode", on ? "1" : "0");
 }
