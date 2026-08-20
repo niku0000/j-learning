@@ -51,6 +51,8 @@
   .examples { list-style:none; padding:0; }
   .examples li { margin:6px 0; padding:8px 12px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-size:0.95rem; }
   body.work .examples li { border:1px solid #e2e2e2; border-left:3px solid #999; background:#fafafa; }
+  .background { background:var(--rule-bg); border-radius:10px; padding:10px 14px; font-size:0.92rem; }
+  body.work .background { background:#f6f6f6; }
   .summary { margin-top:12px; padding:10px 14px; border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:0 8px 8px 0; font-weight:600; }
   .card-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:14px; }
   .card-tag { font-size:0.72rem; padding:2px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent); cursor:pointer; }
@@ -150,6 +152,7 @@ function cardHTML(e) {
     <div class="q">${esc(e.question)}</div>
     ${e.answer ? `<div class="a">${esc(e.answer)}</div>` : ""}
     ${examples ? `<div class="section-label">例句</div><ul class="examples">${examples}</ul>` : ""}
+    ${e.background ? `<div class="section-label">背景・語源</div><div class="background">${esc(e.background)}</div>` : ""}
     ${rules ? `<div class="section-label">排列/規律重點</div><ul class="rules">${rules}</ul>` : ""}
     ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}

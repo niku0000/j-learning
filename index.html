@@ -119,6 +119,11 @@
     font-size: 0.98rem; margin-bottom: 4px;
   }
   .g-explain { font-size: 0.92rem; }
+  .background {
+    background: var(--grammar-bg); border-radius: 12px;
+    padding: 12px 14px; margin-top: 8px; font-size: 0.9rem;
+  }
+  body.work .background { background: #f6f6f6; border-radius: 3px; }
   .note {
     margin-top: 12px; font-size: 0.85rem; color: var(--muted);
     font-style: italic;
@@ -346,6 +351,7 @@ function cardHTML(e) {
     ${e.translation ? `<div class="translation">${esc(e.translation)}</div>` : ""}
     ${words ? `<div class="section-label">單字拆解</div>${words}` : ""}
     ${grammar ? `<div class="section-label">文法・句型</div>${grammar}` : ""}
+    ${e.background ? `<div class="section-label">背景・語源</div><div class="background">${esc(e.background)}</div>` : ""}
     ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
   </div>`;
