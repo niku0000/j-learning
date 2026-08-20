@@ -88,6 +88,7 @@ function conjKuru(form, useReading) {
 
 // 主函式
 function conjugate(verb, form) {
+  if (verb.overrides && verb.overrides[form]) return verb.overrides[form];
   switch (verb.type) {
     case "godan":   return conjGodan(verb.dict, form);
     case "ichidan": return conjIchidan(verb.dict, form);
@@ -97,6 +98,7 @@ function conjugate(verb, form) {
 }
 // 取讀音版（給假名提示用）
 function conjugateReading(verb, form) {
+  if (verb.overrides && verb.overrides[form]) return verb.overrides[form];
   if (verb.type === "kuru") return conjKuru(form, true);
   if (verb.type === "godan")   return conjGodan(verb.reading, form);
   if (verb.type === "ichidan") return conjIchidan(verb.reading, form);
@@ -151,6 +153,9 @@ const N4_VERBS = [
   { dict:"開ける", reading:"あける", type:"ichidan", meaning:"打開" },
   { dict:"閉める", reading:"しめる", type:"ichidan", meaning:"關閉" },
   { dict:"借りる", reading:"かりる", type:"ichidan", meaning:"借入" },
+  { dict:"あげる", reading:"あげる", type:"ichidan", meaning:"給（我/別人 給 別人，箭頭朝外）" },
+  { dict:"くれる", reading:"くれる", type:"ichidan", meaning:"（別人）給我", overrides:{ imperative:"くれ" } },
+  { dict:"もらう", reading:"もらう", type:"godan", meaning:"得到（我從別人那得到）" },
   { dict:"する", reading:"する", type:"suru", meaning:"做" },
   { dict:"勉強する", reading:"べんきょうする", type:"suru", meaning:"學習" },
   { dict:"来る", reading:"くる", type:"kuru", meaning:"來" }
