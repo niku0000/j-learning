@@ -94,6 +94,12 @@
   table.onbin th { background:var(--tag-bg); color:var(--muted); }
   table.onbin td.form { color:var(--accent); font-weight:600; }
   s { color:var(--muted); }
+  details.sec { margin-top:10px; }
+  details.sec > summary { list-style:none; cursor:pointer; padding:8px 0 4px; font-size:0.85rem; color:var(--accent); font-weight:700; display:flex; align-items:center; gap:8px; }
+  details.sec > summary::-webkit-details-marker { display:none; }
+  details.sec > summary::before { content:"▸"; color:var(--muted); transition:transform 0.15s; }
+  details.sec[open] > summary::before { transform:rotate(90deg); }
+  table.onbin.exc td, table.onbin.exc th { padding:5px 8px; font-size:0.8rem; }
 
   /* 摸魚模式（樸素黑白） */
   body.work { background:#fff; color:#1f1f1f; font-family:"Segoe UI",Arial,"Noto Sans TC",sans-serif; }
@@ -155,6 +161,40 @@
     <div class="ref-note warn">
       <b>⚠ 陷阱</b>：長得像 2類、其實是 1類 —— <b>帰る・入る・走る・知る・切る・要る</b>（多是「一個漢字＋る」）。結尾雖是る、前面也是い/え段，但要當 <b>1類</b> 變化，直接背起來！
       <br>例：帰る→帰ります（○，不是帰います）／帰って（○，不是帰て）。
+      <details class="sec exlist">
+        <summary>常見「例外1類」動詞 25 個（點開背）</summary>
+        <div class="tbl-wrap">
+          <table class="onbin exc">
+            <tr><th>動詞</th><th>讀音</th><th>意思</th><th>て形（1類）</th></tr>
+            <tr><td class="form">帰る</td><td>かえる</td><td>回家</td><td>帰って</td></tr>
+            <tr><td class="form">入る</td><td>はいる</td><td>進入</td><td>入って</td></tr>
+            <tr><td class="form">走る</td><td>はしる</td><td>跑</td><td>走って</td></tr>
+            <tr><td class="form">知る</td><td>しる</td><td>知道</td><td>知って</td></tr>
+            <tr><td class="form">切る</td><td>きる</td><td>切</td><td>切って</td></tr>
+            <tr><td class="form">要る</td><td>いる</td><td>需要</td><td>要って</td></tr>
+            <tr><td class="form">返る</td><td>かえる</td><td>返回、恢復</td><td>返って</td></tr>
+            <tr><td class="form">限る</td><td>かぎる</td><td>限定</td><td>限って</td></tr>
+            <tr><td class="form">焦る</td><td>あせる</td><td>焦急</td><td>焦って</td></tr>
+            <tr><td class="form">減る</td><td>へる</td><td>減少</td><td>減って</td></tr>
+            <tr><td class="form">滑る</td><td>すべる</td><td>滑</td><td>滑って</td></tr>
+            <tr><td class="form">蹴る</td><td>ける</td><td>踢</td><td>蹴って</td></tr>
+            <tr><td class="form">喋る</td><td>しゃべる</td><td>說話、聊</td><td>喋って</td></tr>
+            <tr><td class="form">握る</td><td>にぎる</td><td>握</td><td>握って</td></tr>
+            <tr><td class="form">参る</td><td>まいる</td><td>去／來（謙讓）</td><td>参って</td></tr>
+            <tr><td class="form">混じる</td><td>まじる</td><td>混雜</td><td>混じって</td></tr>
+            <tr><td class="form">茂る</td><td>しげる</td><td>茂盛</td><td>茂って</td></tr>
+            <tr><td class="form">照る</td><td>てる</td><td>（陽光）照耀</td><td>照って</td></tr>
+            <tr><td class="form">練る</td><td>ねる</td><td>揉、推敲</td><td>練って</td></tr>
+            <tr><td class="form">遮る</td><td>さえぎる</td><td>遮擋、打斷</td><td>遮って</td></tr>
+            <tr><td class="form">陥る</td><td>おちいる</td><td>陷入</td><td>陥って</td></tr>
+            <tr><td class="form">罵る</td><td>ののしる</td><td>辱罵</td><td>罵って</td></tr>
+            <tr><td class="form">捻る</td><td>ひねる</td><td>扭、轉</td><td>捻って</td></tr>
+            <tr><td class="form">湿る</td><td>しめる</td><td>潮濕</td><td>湿って</td></tr>
+            <tr><td class="form">覆る</td><td>くつがえる</td><td>翻覆、推翻</td><td>覆って</td></tr>
+          </table>
+        </div>
+        <div class="mini">共同特徵：結尾都是「る」且前音在い/え段，但全部照 1類（五段）促音便 → て形都是「〜って」。看到它們別直覺當 2類！</div>
+      </details>
     </div>
 
     <div class="sec-h"><span class="step-badge">STEP 2</span> 判斷完，套該類規則</div>
