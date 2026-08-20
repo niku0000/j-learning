@@ -64,9 +64,19 @@
     outline: none;
   }
   #search:focus { border-color: var(--accent); }
+  .search-row { display: flex; gap: 8px; align-items: stretch; }
+  .search-row #search { flex: 1; }
+  .tag-toggle {
+    flex: 0 0 auto; padding: 0 14px; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+  }
+  .tag-toggle[aria-expanded="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
   .tags-bar {
     display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;
+    max-height: 40vh; overflow-y: auto;
   }
+  .tags-bar.collapsed { display: none; }
   .tag-filter {
     font-size: 0.78rem; padding: 4px 11px; border-radius: 999px;
     background: var(--tag-bg); color: var(--muted);
@@ -98,6 +108,22 @@
     font-size: 0.72rem; color: var(--muted); letter-spacing: 1px;
     text-transform: uppercase; margin: 16px 0 6px;
   }
+  details.sec { margin-top: 10px; border-top: 1px solid var(--border); }
+  details.sec > summary {
+    list-style: none; cursor: pointer; padding: 10px 0 4px;
+    font-size: 0.82rem; color: var(--accent); font-weight: 600;
+    display: flex; align-items: center; gap: 8px;
+  }
+  details.sec > summary::-webkit-details-marker { display: none; }
+  details.sec > summary::before {
+    content: "▸"; color: var(--muted); font-size: 0.8rem; transition: transform 0.15s;
+  }
+  details.sec[open] > summary::before { transform: rotate(90deg); }
+  details.sec > summary .cnt {
+    font-size: 0.7rem; background: var(--tag-bg); color: var(--muted);
+    padding: 0 7px; border-radius: 999px; font-weight: 400;
+  }
+  body.work details.sec > summary { color: #333; }
   .word-row {
     display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline;
     padding: 5px 0; border-bottom: 1px dashed var(--border);
@@ -245,8 +271,11 @@
 </header>
 
 <div class="controls">
-  <input id="search" type="search" placeholder="🔍 搜尋原文 / 中文 / 單字 / 文法…">
-  <div class="tags-bar" id="tagsBar"></div>
+  <div class="search-row">
+    <input id="search" type="search" placeholder="🔍 搜尋原文 / 中文 / 單字 / 文法…">
+    <button class="tag-toggle" id="tagToggle" aria-expanded="false">＃標籤</button>
+  </div>
+  <div class="tags-bar collapsed" id="tagsBar"></div>
   <div class="stats" id="stats"></div>
 </div>
 
@@ -288,7 +317,7 @@ function renderTags() {
     const el = document.createElement("span");
     el.className = "tag-filter" + (activeTag === t ? " active" : "");
     el.textContent = "#" + t;
-    el.onclick = () => { activeTag = (activeTag === t ? null : t); renderTags(); render(); };
+    el.onclick = () => { activeTag = (activeTag === t ? null : t); collapseTags(); renderTags(); render(); };
     bar.appendChild(el);
   });
 }
@@ -349,9 +378,9 @@ function cardHTML(e) {
     <div class="original">${esc(e.original)}</div>
     ${e.reading ? `<div class="reading">${esc(e.reading)}</div>` : ""}
     ${e.translation ? `<div class="translation">${esc(e.translation)}</div>` : ""}
-    ${words ? `<div class="section-label">單字拆解</div>${words}` : ""}
-    ${grammar ? `<div class="section-label">文法・句型</div>${grammar}` : ""}
-    ${e.background ? `<div class="section-label">背景・語源</div><div class="background">${esc(e.background)}</div>` : ""}
+    ${words ? `<details class="sec"><summary>單字拆解 <span class="cnt">${(e.words||[]).length}</span></summary>${words}</details>` : ""}
+    ${grammar ? `<details class="sec"><summary>文法・句型 <span class="cnt">${(e.grammar||[]).length}</span></summary>${grammar}</details>` : ""}
+    ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${esc(e.background)}</div></details>` : ""}
     ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
   </div>`;
@@ -361,6 +390,18 @@ document.getElementById("search").addEventListener("input", ev => {
   query = ev.target.value.trim();
   render();
 });
+
+// 標籤收合切換
+const tagToggle = document.getElementById("tagToggle");
+function collapseTags() {
+  document.getElementById("tagsBar").classList.add("collapsed");
+  tagToggle.setAttribute("aria-expanded", "false");
+}
+tagToggle.onclick = () => {
+  const bar = document.getElementById("tagsBar");
+  const open = bar.classList.toggle("collapsed") === false;
+  tagToggle.setAttribute("aria-expanded", open ? "true" : "false");
+};
 
 // ===== 摸魚模式（偽 Excel） =====
 const workBtn = document.getElementById("workToggle");

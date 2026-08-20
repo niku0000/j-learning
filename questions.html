@@ -31,7 +31,12 @@
   .controls { position:sticky; top:0; z-index:10; background:var(--bg); max-width:760px; margin:0 auto; padding:12px 0; }
   #search { width:100%; padding:12px 16px; font-size:1rem; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--text); outline:none; }
   #search:focus { border-color:var(--accent); }
-  .tags-bar { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .search-row { display:flex; gap:8px; align-items:stretch; }
+  .search-row #search { flex:1; }
+  .tag-toggle { flex:0 0 auto; padding:0 14px; border-radius:12px; border:1px solid var(--border); background:var(--card); color:var(--muted); font-size:0.85rem; cursor:pointer; white-space:nowrap; }
+  .tag-toggle[aria-expanded="true"] { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .tags-bar { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; max-height:40vh; overflow-y:auto; }
+  .tags-bar.collapsed { display:none; }
   .tag-filter { font-size:0.78rem; padding:4px 11px; border-radius:999px; background:var(--tag-bg); color:var(--muted); border:1px solid transparent; cursor:pointer; user-select:none; }
   .tag-filter.active { background:var(--accent); color:#fff; }
   .stats { color:var(--muted); font-size:0.8rem; margin:6px 2px 0; }
@@ -46,6 +51,13 @@
   .a { margin-top:8px; }
   .a::before { content:"A　"; color:var(--muted); font-weight:700; }
   .section-label { font-size:0.72rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin:16px 0 6px; }
+  details.sec { margin-top:10px; border-top:1px solid var(--border); }
+  details.sec > summary { list-style:none; cursor:pointer; padding:10px 0 4px; font-size:0.82rem; color:var(--accent); font-weight:600; display:flex; align-items:center; gap:8px; }
+  details.sec > summary::-webkit-details-marker { display:none; }
+  details.sec > summary::before { content:"▸"; color:var(--muted); font-size:0.8rem; transition:transform 0.15s; }
+  details.sec[open] > summary::before { transform:rotate(90deg); }
+  details.sec > summary .cnt { font-size:0.7rem; background:var(--tag-bg); color:var(--muted); padding:0 7px; border-radius:999px; font-weight:400; }
+  body.work details.sec > summary { color:#333; }
   .rules { background:var(--rule-bg); border-radius:12px; padding:10px 14px 10px 30px; }
   .rules li { margin:5px 0; font-size:0.92rem; }
   .examples { list-style:none; padding:0; }
@@ -84,8 +96,11 @@
 </header>
 
 <div class="controls">
-  <input id="search" type="search" placeholder="🔍 搜尋問題 / 主題 / 例句…">
-  <div class="tags-bar" id="tagsBar"></div>
+  <div class="search-row">
+    <input id="search" type="search" placeholder="🔍 搜尋問題 / 主題 / 例句…">
+    <button class="tag-toggle" id="tagToggle" aria-expanded="false">＃標籤</button>
+  </div>
+  <div class="tags-bar collapsed" id="tagsBar"></div>
   <div class="stats" id="stats"></div>
 </div>
 
@@ -121,7 +136,7 @@ function renderTags() {
     const el = document.createElement("span");
     el.className = "tag-filter" + (activeTag === t ? " active" : "");
     el.textContent = "#" + t;
-    el.onclick = () => { activeTag = (activeTag === t ? null : t); renderTags(); render(); };
+    el.onclick = () => { activeTag = (activeTag === t ? null : t); collapseTags(); renderTags(); render(); };
     bar.appendChild(el);
   });
 }
@@ -151,14 +166,25 @@ function cardHTML(e) {
     ${e.context ? `<div class="context">${esc(e.context)}</div>` : ""}
     <div class="q">${esc(e.question)}</div>
     ${e.answer ? `<div class="a">${esc(e.answer)}</div>` : ""}
-    ${examples ? `<div class="section-label">例句</div><ul class="examples">${examples}</ul>` : ""}
-    ${e.background ? `<div class="section-label">背景・語源</div><div class="background">${esc(e.background)}</div>` : ""}
-    ${rules ? `<div class="section-label">排列/規律重點</div><ul class="rules">${rules}</ul>` : ""}
+    ${examples ? `<details class="sec" open><summary>例句 <span class="cnt">${(e.examples||[]).length}</span></summary><ul class="examples">${examples}</ul></details>` : ""}
+    ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${esc(e.background)}</div></details>` : ""}
+    ${rules ? `<details class="sec"><summary>排列/規律重點 <span class="cnt">${(e.rules||[]).length}</span></summary><ul class="rules">${rules}</ul></details>` : ""}
     ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
   </div>`;
 }
 document.getElementById("search").addEventListener("input", ev => { query = ev.target.value.trim(); render(); });
+
+const tagToggle = document.getElementById("tagToggle");
+function collapseTags() {
+  document.getElementById("tagsBar").classList.add("collapsed");
+  tagToggle.setAttribute("aria-expanded", "false");
+}
+tagToggle.onclick = () => {
+  const bar = document.getElementById("tagsBar");
+  const open = bar.classList.toggle("collapsed") === false;
+  tagToggle.setAttribute("aria-expanded", open ? "true" : "false");
+};
 
 // 摸魚模式
 const workBtn = document.getElementById("workToggle");
