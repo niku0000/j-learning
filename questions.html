@@ -48,6 +48,9 @@
   .section-label { font-size:0.72rem; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin:16px 0 6px; }
   .rules { background:var(--rule-bg); border-radius:12px; padding:10px 14px 10px 30px; }
   .rules li { margin:5px 0; font-size:0.92rem; }
+  .examples { list-style:none; padding:0; }
+  .examples li { margin:6px 0; padding:8px 12px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:0 8px 8px 0; font-size:0.95rem; }
+  body.work .examples li { border:1px solid #e2e2e2; border-left:3px solid #999; background:#fafafa; }
   .summary { margin-top:12px; padding:10px 14px; border-left:3px solid var(--accent); background:var(--accent-soft); border-radius:0 8px 8px 0; font-weight:600; }
   .card-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:14px; }
   .card-tag { font-size:0.72rem; padding:2px 9px; border-radius:999px; background:var(--accent-soft); color:var(--accent); cursor:pointer; }
@@ -138,6 +141,7 @@ function render() {
 }
 function cardHTML(e) {
   const rules = (e.rules||[]).map(r => `<li>${esc(r)}</li>`).join("");
+  const examples = (e.examples||[]).map(x => `<li>${esc(x)}</li>`).join("");
   const tags = (e.tags||[]).map(t => `<span class="card-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("");
   return `
   <div class="card">
@@ -145,6 +149,7 @@ function cardHTML(e) {
     ${e.context ? `<div class="context">${esc(e.context)}</div>` : ""}
     <div class="q">${esc(e.question)}</div>
     ${e.answer ? `<div class="a">${esc(e.answer)}</div>` : ""}
+    ${examples ? `<div class="section-label">例句</div><ul class="examples">${examples}</ul>` : ""}
     ${rules ? `<div class="section-label">排列/規律重點</div><ul class="rules">${rules}</ul>` : ""}
     ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
