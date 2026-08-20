@@ -77,7 +77,23 @@
   .ref-note { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-top:14px; font-size:0.88rem; }
   .ref-note b { color:var(--accent); }
   .ref-note ul { margin:6px 0 0 18px; } .ref-note li { margin:3px 0; }
-  .sec-h { font-size:0.95rem; font-weight:700; margin:18px 0 8px; }
+  .sec-h { font-size:0.95rem; font-weight:700; margin:20px 0 8px; display:flex; align-items:center; gap:8px; }
+  .step-badge { font-size:0.72rem; background:var(--accent); color:#fff; padding:2px 9px; border-radius:6px; font-weight:700; }
+  .ref-note.intro { background:var(--accent-soft, #eef4f0); }
+  .ref-note .steps3 { margin-top:6px; font-weight:600; }
+  .ref-note .sixforms { margin-top:8px; font-size:0.82rem; color:var(--muted); }
+  .ref-note.warn { border-left:4px solid var(--accent); }
+  .ref-note.tail { text-align:center; }
+  .flow { margin:8px 0 0 18px; } .flow li { margin:8px 0; }
+  .sub-h { font-weight:700; margin:12px 0 4px; font-size:0.9rem; }
+  .mini { font-size:0.8rem; color:var(--muted); margin-top:6px; }
+  .cls { font-size:0.72rem; padding:1px 8px; border-radius:999px; font-weight:700; color:#fff; white-space:nowrap; }
+  .cls1 { background:#c0563f; } .cls2 { background:#4a8c6f; } .cls3 { background:#7a6cc0; }
+  table.onbin { width:100%; border-collapse:collapse; font-size:0.82rem; margin-top:4px; }
+  table.onbin th, table.onbin td { border:1px solid var(--border); padding:6px 8px; text-align:left; white-space:nowrap; }
+  table.onbin th { background:var(--tag-bg); color:var(--muted); }
+  table.onbin td.form { color:var(--accent); font-weight:600; }
+  s { color:var(--muted); }
 
   /* 摸魚模式（樸素黑白） */
   body.work { background:#fff; color:#1f1f1f; font-family:"Segoe UI",Arial,"Noto Sans TC",sans-serif; }
@@ -120,32 +136,76 @@
 
   <!-- 速記表 -->
   <div class="panel" id="panel-ref">
-    <div class="sec-h">三類動詞 × 各變化形</div>
+
+    <div class="ref-note intro">
+      <b>學習順序：先分類，再變化</b>
+      <div class="steps3">① 先判斷是第幾類 → ② 套該類規則 → ③ 六形態全解鎖</div>
+      <div class="sixforms">六形態：原形 → ます形（禮貌）／て形（連接・請求）／た形（過去）／ない形（否定）／なかった形（過去否定）</div>
+    </div>
+
+    <div class="sec-h"><span class="step-badge">STEP 1</span> 先判斷：這個動詞是第幾類？</div>
+    <div class="ref-note">
+      動詞原形結尾一定是「う段音」（う・く・ぐ・す・つ・ぬ・ぶ・む・る）。照順序問兩個問題：
+      <ol class="flow">
+        <li><b>問①</b>：是 <b>する・来る・〇〇する</b> 嗎？<br>→ 是 → <span class="cls cls3">3類（不規則）</span>，只有兩個，直接背。</li>
+        <li><b>問②</b>：結尾是「る」，<b>且 る 前一個音在「い段或え段」</b>嗎？（い段：い･き･し･ち…／え段：え･け･せ･て…）<br>→ 是 → <span class="cls cls2">2類（一段）</span>，最簡單。</li>
+        <li><b>以上皆非</b> → <span class="cls cls1">1類（五段）</span>，變化最多。</li>
+      </ol>
+    </div>
+    <div class="ref-note warn">
+      <b>⚠ 陷阱</b>：長得像 2類、其實是 1類 —— <b>帰る・入る・走る・知る・切る・要る</b>（多是「一個漢字＋る」）。結尾雖是る、前面也是い/え段，但要當 <b>1類</b> 變化，直接背起來！
+      <br>例：帰る→帰ります（○，不是帰います）／帰って（○，不是帰て）。
+    </div>
+
+    <div class="sec-h"><span class="step-badge">STEP 2</span> 判斷完，套該類規則</div>
+
+    <div class="ref-note">
+      <b><span class="cls cls3">3類</span> 不規則・直接背（只有兩個）</b>
+      <ul>
+        <li><b>する</b> → します・して・した・しない・しなかった</li>
+        <li><b>来る</b> → きます・きて・きた・こない・こなかった　<b>※讀音 く→き→こ 會變！</b></li>
+      </ul>
+    </div>
+
+    <div class="ref-note">
+      <b><span class="cls cls2">2類</span> 一段・最簡單：去掉「る」直接加</b>
+      <ul>
+        <li>食べ<s>る</s> ＋ ます／て／た／ない／なかった</li>
+        <li>→ 食べます・食べて・食べた・食べない・食べなかった</li>
+      </ul>
+    </div>
+
+    <div class="ref-note">
+      <b><span class="cls cls1">1類</span> 五段・規則最多但邏輯清楚</b>
+      <div class="sub-h">▍ます形／ない形 ＝ 換段（結尾假名在同一行上下換段）</div>
+      <ul>
+        <li><b>ます形</b>：結尾 <b>う段→い段</b> ＋ます（のむ→のみます）</li>
+        <li><b>ない形</b>：結尾 <b>う段→あ段</b> ＋ない（のむ→のまない）</li>
+        <li>★ 例外：結尾「う」→變「わ」不是「あ」！かう→かわない</li>
+        <li><b>なかった形</b>：ない形的「ない」直接換成「なかった」（のまない→のまなかった）</li>
+      </ul>
+      <div class="mini">段序：あ→い→う→え→お。う段是原形結尾，ます往い、ない往あ。</div>
+
+      <div class="sub-h">▍て形／た形 ＝ 音便（重點！尾巴會變音）</div>
+      <div class="tbl-wrap">
+        <table class="onbin">
+          <tr><th>結尾</th><th>變成</th><th>音便</th><th>例</th></tr>
+          <tr><td class="form">う・つ・る</td><td>って／った</td><td>促音便（小っ）</td><td>買う→買って／待つ→待った</td></tr>
+          <tr><td class="form">ぬ・む・ぶ</td><td>んで／んだ</td><td>鼻音便</td><td>飲む→飲んで／遊ぶ→遊んだ</td></tr>
+          <tr><td class="form">く</td><td>いて／いた</td><td>い音便</td><td>書く→書いて</td></tr>
+          <tr><td class="form">ぐ</td><td>いで／いだ</td><td>い音便（濁音）</td><td>泳ぐ→泳いで</td></tr>
+          <tr><td class="form">す</td><td>して／した</td><td>不變音</td><td>話す→話して</td></tr>
+          <tr><td class="form">行く</td><td>行って／行った</td><td>★唯一例外</td><td>不是「いいて」！</td></tr>
+        </table>
+      </div>
+      <div class="mini">記憶鉤：① た形＝把て形的「て→た・で→だ」換掉 ② ぬ・む・ぶ 都是嘴唇閉起來的鼻音→一起變「んで」 ③ 濁點（ぐ）保留→「いで」</div>
+    </div>
+
+    <div class="sec-h">六形態對照（判斷正確後就全解鎖）</div>
     <div class="tbl-wrap">
       <table id="refTable"></table>
     </div>
-    <div class="ref-note">
-      <b>五段動詞：怎麼推？</b> 把語尾假名換到不同「行」再接尾巴：
-      <ul>
-        <li><b>ます形</b>：語尾→い段＋ます（飲む→飲みます）</li>
-        <li><b>ない/受身/使役</b>：語尾→あ段（う→わ！）＋ない/れる/せる（飲む→飲まない）</li>
-        <li><b>可能/命令/假定</b>：語尾→え段（飲む→飲める／飲め／飲めば）</li>
-        <li><b>意向</b>：語尾→お段＋う（飲む→飲もう）</li>
-        <li><b>て/た形（促音便）</b>：う・つ・る→って/った；ぬ・ぶ・む→んで/んだ；く→いて；ぐ→いで；す→して。<b>例外：行く→行って</b></li>
-      </ul>
-    </div>
-    <div class="ref-note">
-      <b>一段動詞：最簡單</b> 去掉「る」直接接：て・た・ない・ます；可能/受身都是＋られる；意向＋よう；命令＋ろ。（食べる→食べて/食べない/食べられる/食べよう）
-    </div>
-    <div class="ref-note">
-      <b>不規則只有兩個</b>：<br>
-      <b>する</b>→します・して・しない・できる(可能)・しよう・される・させる・しろ・すれば<br>
-      <b>来る(くる)</b>→来ます(きます)・来て(きて)・来ない(こない)・来られる(こられる)・来よう(こよう)・来い(こい)・来れば(くれば)　※讀音會變，要特別記
-    </div>
-    <div class="ref-note">
-      <b>陷阱：例外五段</b> 帰る・入る・走る・知る・要る・切る 等，長得像一段但其實是五段！<br>
-      例：帰る→帰ります(○) 不是 帰います；帰って(○) 不是 帰て。
-    </div>
+    <div class="ref-note tail"><b>先分類，再變化</b> —— 判斷正確後，套上該類規則，六種形態就全部解鎖了！</div>
   </div>
 </div>
 
@@ -206,7 +266,7 @@ function pickQuestion() {
   renderQuestion();
 }
 
-const typeLabel = { godan:"五段", ichidan:"一段", suru:"する", kuru:"来る" };
+const typeLabel = { godan:"1類·五段", ichidan:"2類·一段", suru:"3類·する", kuru:"3類·来る" };
 
 function renderQuestion() {
   const { verb, form } = cur;
@@ -271,17 +331,21 @@ document.getElementById("srcMine").onchange = () => {};
 
 // ===== 速記表 =====
 function buildRefTable() {
+  // 依講義順序：2類 → 1類（含例外行く）→ 3類
   const samples = [
+    N4_VERBS.find(v=>v.dict==="食べる"),
     N4_VERBS.find(v=>v.dict==="飲む"),
     N4_VERBS.find(v=>v.dict==="行く"),
-    N4_VERBS.find(v=>v.dict==="食べる"),
     N4_VERBS.find(v=>v.dict==="する"),
     N4_VERBS.find(v=>v.dict==="来る")
   ];
-  let html = "<tr><th>變化形</th>";
-  samples.forEach(v => html += `<th>${v.dict}<br><span style="font-weight:400;font-size:0.9em">${typeLabel[v.type]}</span></th>`);
+  // 六形態的核心五個（原形已在表頭）：ます・て・た・ない・なかった
+  const coreForms = ["masu","te","ta","nai","nakatta"].map(k => FORMS.find(f=>f.key===k));
+  let html = "<tr><th>形態＼動詞</th>";
+  samples.forEach(v => html += `<th>${v.dict}<br><span style="font-weight:400;font-size:0.85em">${typeLabel[v.type]}</span></th>`);
   html += "</tr>";
-  FORMS.forEach(f => {
+  html += `<tr><td class="form">原形</td>` + samples.map(v=>`<td>${v.dict}</td>`).join("") + "</tr>";
+  coreForms.forEach(f => {
     html += `<tr><td class="form">${f.label}</td>`;
     samples.forEach(v => html += `<td>${conjugate(v,f.key)}</td>`);
     html += "</tr>";

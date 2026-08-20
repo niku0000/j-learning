@@ -15,6 +15,7 @@ const FORMS = [
   { key: "te",         label: "て形" },
   { key: "ta",         label: "た形（過去）" },
   { key: "nai",        label: "ない形（否定）" },
+  { key: "nakatta",    label: "なかった形（過去否定）" },
   { key: "potential",  label: "可能形（能夠）" },
   { key: "volitional", label: "意向形（～よう）" },
   { key: "passive",    label: "受身形（被動）" },
@@ -89,6 +90,8 @@ function conjKuru(form, useReading) {
 // 主函式
 function conjugate(verb, form) {
   if (verb.overrides && verb.overrides[form]) return verb.overrides[form];
+  // なかった形 ＝ ない形把「ない」換成「なかった」
+  if (form === "nakatta") return conjugate(verb, "nai").replace(/ない$/, "なかった");
   switch (verb.type) {
     case "godan":   return conjGodan(verb.dict, form);
     case "ichidan": return conjIchidan(verb.dict, form);
@@ -99,6 +102,7 @@ function conjugate(verb, form) {
 // 取讀音版（給假名提示用）
 function conjugateReading(verb, form) {
   if (verb.overrides && verb.overrides[form]) return verb.overrides[form];
+  if (form === "nakatta") return conjugateReading(verb, "nai").replace(/ない$/, "なかった");
   if (verb.type === "kuru") return conjKuru(form, true);
   if (verb.type === "godan")   return conjGodan(verb.reading, form);
   if (verb.type === "ichidan") return conjIchidan(verb.reading, form);
