@@ -120,6 +120,22 @@
   .theme-toggle { position:fixed; right:14px; bottom:54px; z-index:50; width:34px; height:34px; border-radius:999px; background:var(--card); color:var(--muted); border:1px solid var(--border); cursor:pointer; opacity:0.5; font-size:1rem; display:flex; align-items:center; justify-content:center; }
   .theme-toggle:hover { opacity:1; }
   body.work .theme-toggle { display:none; }
+  .cnt-badge { display:inline-block; min-width:16px; padding:0 4px; border-radius:999px; background:var(--bad); color:#fff; font-size:0.68rem; line-height:16px; text-align:center; }
+  .cnt-badge:empty { display:none; }
+  .mistakes-head { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .btn-clear { flex:0 0 auto; background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:8px; padding:6px 12px; font-size:0.8rem; cursor:pointer; }
+  .btn-clear:hover { border-color:var(--bad); color:var(--bad); }
+  .mistake-card {
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:14px 16px; margin-top:10px; display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .mistake-main { flex:1; min-width:0; }
+  .mistake-verb { font-size:1.05rem; font-weight:700; }
+  .mistake-verb .arrow { color:var(--muted); font-weight:400; margin:0 4px; }
+  .mistake-ans { color:var(--good); font-weight:700; }
+  .mistake-form { font-size:0.75rem; color:var(--muted); margin-top:2px; }
+  .mistake-count { flex:0 0 auto; font-size:0.72rem; background:var(--bad); color:#fff; padding:3px 9px; border-radius:999px; }
+  .empty-mistakes { text-align:center; color:var(--muted); padding:50px 20px; font-size:0.92rem; }
 </style>
 </head>
 <body>
@@ -132,6 +148,7 @@
   <div class="tabs">
     <div class="tab active" data-panel="quiz">翻卡測驗</div>
     <div class="tab" data-panel="ref">變化速記表</div>
+    <div class="tab" data-panel="mistakes">錯題本 <span id="mistakeCount" class="cnt-badge"></span></div>
   </div>
 
   <!-- 翻卡 -->
@@ -255,6 +272,15 @@
     </div>
     <div class="ref-note tail"><b>先分類，再變化</b> —— 判斷正確後，套上該類規則，六種形態就全部解鎖了！</div>
   </div>
+
+  <!-- 錯題本 -->
+  <div class="panel" id="panel-mistakes">
+    <div class="opts mistakes-head">
+      <div class="lbl">翻卡測驗答錯的題目會自動存在這裡，答對一次就會移除</div>
+      <button class="btn-clear" id="clearMistakes">清空錯題本</button>
+    </div>
+    <div id="mistakeList"></div>
+  </div>
 </div>
 
 <button class="theme-toggle" id="themeToggle" title="切換深色/淺色模式">🌙</button>
@@ -297,13 +323,17 @@ function buildPool() {
 
 // ===== 出題 =====
 let cur = null;
+let answered = false; // 目前這題是否已翻開答案
 let stats = { done:0, know:0 };
-const missQueue = []; // 錯題稍後重來
+const missQueue = []; // 錯題稍後重來（優先再出）
+
+const typeLabel = { godan:"1類·五段", ichidan:"2類·一段", suru:"3類·する", kuru:"3類·来る" };
+const cardEl = document.getElementById("card");
 
 function pickQuestion() {
   buildPool();
   const forms = activeForms();
-  if (!forms.length) { document.getElementById("card").innerHTML = '<div class="hint">請至少選一個變化形</div>'; return; }
+  if (!forms.length) { cardEl.innerHTML = '<div class="hint">請至少選一個變化形</div>'; return; }
   // 30% 機率優先出錯題
   if (missQueue.length && Math.random() < 0.35) {
     cur = missQueue.shift();
@@ -312,32 +342,30 @@ function pickQuestion() {
     const f = forms[Math.floor(Math.random()*forms.length)];
     cur = { verb:v, form:f };
   }
+  answered = false;
   renderQuestion();
 }
-
-const typeLabel = { godan:"1類·五段", ichidan:"2類·一段", suru:"3類·する", kuru:"3類·来る" };
 
 function renderQuestion() {
   const { verb, form } = cur;
   const formLabel = FORMS.find(f => f.key===form).label;
-  document.getElementById("card").innerHTML = `
+  cardEl.innerHTML = `
     <div class="q-form">變成 ${formLabel} ？</div>
     <div class="q-verb">${verb.dict}</div>
     <div class="q-reading">${verb.reading !== verb.dict ? verb.reading : ""}</div>
     <div class="q-mean">${verb.meaning || ""}</div>
     <div class="q-type">${typeLabel[verb.type]||""}${verb.fromMine?" · 我的記錄":""}</div>
     <div class="hint">點卡片看答案</div>`;
-  document.getElementById("card").onclick = showAnswer;
 }
 
 function showAnswer() {
+  if (!cur || answered) return;
+  answered = true;
   const { verb, form } = cur;
   const ans = conjugate(verb, form);
   const ansR = conjugateReading(verb, form);
   const formLabel = FORMS.find(f => f.key===form).label;
-  const card = document.getElementById("card");
-  card.onclick = null;
-  card.innerHTML = `
+  cardEl.innerHTML = `
     <div class="q-form">${verb.dict} 的 ${formLabel}</div>
     <div class="q-verb" style="font-size:1.6rem;color:var(--muted)">${verb.dict}</div>
     <div class="answer">
@@ -345,16 +373,22 @@ function showAnswer() {
       <div class="a-reading">${ansR !== ans ? ansR : ""}</div>
     </div>
     <div class="btns">
-      <button class="btn dunno" id="bDunno">不會 / 錯</button>
-      <button class="btn know" id="bKnow">會了</button>
+      <button class="btn dunno" data-act="dunno">不會 / 錯</button>
+      <button class="btn know" data-act="know">會了</button>
     </div>`;
-  document.getElementById("bKnow").onclick = () => grade(true);
-  document.getElementById("bDunno").onclick = () => grade(false);
 }
+
+// 事件委派：卡片本身只綁定一次，永遠有效，不受重複 innerHTML 影響
+cardEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-act]");
+  if (btn) { grade(btn.dataset.act === "know"); return; }
+  if (!answered) showAnswer();
+});
 
 function grade(ok) {
   stats.done++; if (ok) stats.know++;
-  if (!ok) missQueue.push(cur); // 錯的排回去
+  if (!ok) { missQueue.push(cur); recordMistake(cur); }
+  else clearMistake(cur);
   updateScore();
   pickQuestion();
 }
@@ -364,9 +398,72 @@ function updateScore() {
     `本次 ${stats.done} 題　答對 ${stats.know}　正確率 ${acc}%` + (missQueue.length?`　待複習 ${missQueue.length}`:"");
 }
 
+// ===== 錯題本（localStorage 永久保存） =====
+const MISTAKES_KEY = "verbMistakes";
+function loadMistakes() {
+  try { return JSON.parse(localStorage.getItem(MISTAKES_KEY)) || []; }
+  catch (e) { return []; }
+}
+function saveMistakes(list) {
+  localStorage.setItem(MISTAKES_KEY, JSON.stringify(list));
+  renderMistakeBadge(list);
+}
+function mistakeKey(q) { return q.verb.dict + "|" + q.form; }
+function recordMistake(q) {
+  const list = loadMistakes();
+  const key = mistakeKey(q);
+  const existing = list.find(m => m.key === key);
+  if (existing) { existing.count++; existing.lastMiss = Date.now(); }
+  else {
+    list.push({
+      key, dict: q.verb.dict, reading: q.verb.reading, type: q.verb.type,
+      form: q.form, formLabel: FORMS.find(f=>f.key===q.form).label,
+      answer: conjugate(q.verb, q.form), answerReading: conjugateReading(q.verb, q.form),
+      count: 1, lastMiss: Date.now()
+    });
+  }
+  saveMistakes(list);
+  if (document.getElementById("panel-mistakes").classList.contains("active")) renderMistakePanel();
+}
+function clearMistake(q) {
+  const list = loadMistakes();
+  const key = mistakeKey(q);
+  const next = list.filter(m => m.key !== key);
+  if (next.length !== list.length) {
+    saveMistakes(next);
+    if (document.getElementById("panel-mistakes").classList.contains("active")) renderMistakePanel();
+  }
+}
+function renderMistakeBadge(list) {
+  const n = (list || loadMistakes()).length;
+  document.getElementById("mistakeCount").textContent = n ? String(n) : "";
+}
+function renderMistakePanel() {
+  const list = loadMistakes().slice().sort((a,b) => b.count - a.count || b.lastMiss - a.lastMiss);
+  const box = document.getElementById("mistakeList");
+  if (!list.length) {
+    box.innerHTML = '<div class="empty-mistakes">目前沒有錯題，太強了 👍</div>';
+    return;
+  }
+  box.innerHTML = list.map(m => `
+    <div class="mistake-card">
+      <div class="mistake-main">
+        <div class="mistake-verb">${m.dict}<span class="arrow">→</span><span class="mistake-ans">${m.answer}</span></div>
+        <div class="mistake-form">${m.formLabel}${m.answerReading !== m.answer ? "　" + m.answerReading : ""}</div>
+      </div>
+      <div class="mistake-count">錯 ${m.count} 次</div>
+    </div>`).join("");
+}
+document.getElementById("clearMistakes").onclick = () => {
+  if (!confirm("確定要清空錯題本嗎？")) return;
+  saveMistakes([]);
+  renderMistakePanel();
+};
+renderMistakeBadge();
+
 // ===== 變化形選擇 chips =====
 const chipsBox = document.getElementById("formChips");
-const DEFAULT_ON = ["te","ta","nai","potential"];
+const DEFAULT_ON = ["masu","te","ta","nai","nakatta"];
 FORMS.forEach(f => {
   const el = document.createElement("span");
   el.className = "chip" + (DEFAULT_ON.includes(f.key)?" on":"");
@@ -409,6 +506,7 @@ document.querySelectorAll(".tab").forEach(t => {
     document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));
     t.classList.add("active");
     document.getElementById("panel-"+t.dataset.panel).classList.add("active");
+    if (t.dataset.panel === "mistakes") renderMistakePanel();
   };
 });
 
