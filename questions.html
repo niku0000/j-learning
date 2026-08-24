@@ -11,11 +11,16 @@
     --reading:#9a938a; --tag-bg:#efece6; --rule-bg:#eef3fa;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --bg:#1b1a18; --card:#262421; --text:#e8e4dd; --muted:#9a938a;
       --accent:#5c9be8; --accent-soft:#26303a; --border:#38352f;
       --reading:#8a837a; --tag-bg:#322f2a; --rule-bg:#21292f;
     }
+  }
+  :root[data-theme="dark"] {
+    --bg:#1b1a18; --card:#262421; --text:#e8e4dd; --muted:#9a938a;
+    --accent:#5c9be8; --accent-soft:#26303a; --border:#38352f;
+    --reading:#8a837a; --tag-bg:#322f2a; --rule-bg:#21292f;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body {
@@ -87,6 +92,9 @@
   .work-toggle { position:fixed; right:14px; bottom:14px; z-index:50; font-size:0.72rem; padding:6px 12px; border-radius:999px; background:var(--card); color:var(--muted); border:1px solid var(--border); cursor:pointer; opacity:0.5; }
   .work-toggle:hover { opacity:1; }
   body.work .work-toggle { background:#fff; color:#999; border:1px solid #d0d0d0; opacity:0.4; }
+  .theme-toggle { position:fixed; right:14px; bottom:54px; z-index:50; width:34px; height:34px; border-radius:999px; background:var(--card); color:var(--muted); border:1px solid var(--border); cursor:pointer; opacity:0.5; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+  .theme-toggle:hover { opacity:1; }
+  body.work .theme-toggle { display:none; }
 </style>
 </head>
 <body>
@@ -107,6 +115,7 @@
 <main id="list"></main>
 <footer>我特別提出來的問題 ・ 每次發問就會自動記錄</footer>
 
+<button class="theme-toggle" id="themeToggle" title="切換深色/淺色模式">🌙</button>
 <button class="work-toggle" id="workToggle" title="切換摸魚模式（Esc）">摸魚模式</button>
 
 <script>
@@ -185,6 +194,23 @@ tagToggle.onclick = () => {
   const open = bar.classList.toggle("collapsed") === false;
   tagToggle.setAttribute("aria-expanded", open ? "true" : "false");
 };
+
+// 深色/淺色模式（與其他頁共用 localStorage）
+const themeBtn = document.getElementById("themeToggle");
+function applyTheme(theme) {
+  if (theme) document.documentElement.setAttribute("data-theme", theme);
+  else document.documentElement.removeAttribute("data-theme");
+  const isDark = theme ? theme === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  themeBtn.textContent = isDark ? "☀️" : "🌙";
+}
+themeBtn.onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const isDarkNow = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  const next = isDarkNow ? "light" : "dark";
+  localStorage.setItem("theme", next);
+  applyTheme(next);
+};
+applyTheme(localStorage.getItem("theme"));
 
 // 摸魚模式
 const workBtn = document.getElementById("workToggle");
