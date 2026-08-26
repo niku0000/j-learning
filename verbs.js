@@ -29,6 +29,8 @@ function teToTa(te) { return te.slice(0, -1) + (te.endsWith("で") ? "だ" : "�
 function conjGodan(dict, form) {
   const stem = dict.slice(0, -1);
   const last = dict.slice(-1);
+  // 防呆：語尾不是「う段假名」就無法變化（例如把名詞誤當動詞）
+  if (!(last in ROW_A)) return null;
   // 行く 的て/た例外
   const teForm = (dict === "行く" || dict === "いく") ? stem + "って" : stem + TE[last];
   switch (form) {
@@ -179,4 +181,46 @@ function guessType(dict, reading) {
     if ("いきしちにひみりぎじびぴえけせてねへめれげぜでべぺ".includes(prev)) return "ichidan";
   }
   return "godan";
+}
+
+// 動詞原形的語尾一定是「う段音」
+const U_ROW = "うくぐすつぬぶむる";
+
+// 特殊五段敬語動詞：ます形/命令形不規則（なさる→なさいます，非なさります）
+const HONORIFIC_IRREGULAR = {
+  "なさる":     { masu:"なさいます",     imperative:"なさい" },
+  "いらっしゃる":{ masu:"いらっしゃいます", imperative:"いらっしゃい" },
+  "おっしゃる": { masu:"おっしゃいます",   imperative:"おっしゃい" },
+  "くださる":   { masu:"くださいます",     imperative:"ください" },
+  "ござる":     { masu:"ございます",       imperative:"ござい" }
+};
+
+// 把使用者記錄裡的詞正規化成可變化的動詞；無法變化就回傳 null
+// pos 例："動詞（1類）"、"名詞／する動詞"、"する動詞" 等
+function normalizeVerb(dict, reading, pos, meaning) {
+  if (!dict) return null;
+  // 去掉括號註記：忘れる（下一段） → 忘れる
+  dict = String(dict).replace(/[（(].*$/, "").trim();
+  reading = String(reading || dict).replace(/[（(].*$/, "").trim();
+  if (!dict) return null;
+
+  const posStr = String(pos || "");
+  // する動詞（名詞＋する）：満足 → 満足する
+  const isSuruNoun = /する動詞|サ変/.test(posStr);
+  if (isSuruNoun && !dict.endsWith("する")) {
+    dict += "する";
+    reading += "する";
+  }
+
+  // 語尾必須是う段假名，否則不是可變化的動詞原形（例如純名詞「満足」）
+  const lastKana = reading.slice(-1);
+  if (!U_ROW.includes(lastKana)) return null;
+
+  const type = guessType(dict, reading);
+  const v = { dict, reading, type, meaning: meaning || "", fromMine: true };
+  // 敬語動詞的不規則形（なさる→なさいます 等）
+  if (HONORIFIC_IRREGULAR[dict]) v.overrides = { ...HONORIFIC_IRREGULAR[dict] };
+  // 最終驗證：實際變化一次，算不出來就丟棄
+  if (!conjugate(v, "te") || !conjugate(v, "nai")) return null;
+  return v;
 }

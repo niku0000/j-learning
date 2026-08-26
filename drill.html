@@ -299,13 +299,12 @@ async function loadMine() {
     const seen = new Set();
     (data.entries || []).forEach(e => {
       (e.words || []).forEach(w => {
-        if (w.pos && w.pos.includes("動詞") && w.word && !seen.has(w.word)) {
-          seen.add(w.word);
-          // 讀音去掉可能的「（下一段）」等括號
-          const rd = (w.reading || w.word).replace(/[（(].*$/, "");
-          const dict = w.word.replace(/[（(].*$/, "");
-          mineVerbs.push({ dict, reading: rd, type: guessType(dict, rd), meaning: (w.meaning||""), fromMine:true });
-        }
+        if (!w.pos || !w.pos.includes("動詞") || !w.word) return;
+        // 正規化＋驗證：する動詞補上する、非動詞或算不出變化的直接跳過
+        const v = normalizeVerb(w.word, w.reading, w.pos, w.meaning);
+        if (!v || seen.has(v.dict)) return;
+        seen.add(v.dict);
+        mineVerbs.push(v);
       });
     });
   } catch (e) { /* 沒有也沒關係 */ }
@@ -360,10 +359,12 @@ function renderQuestion() {
 
 function showAnswer() {
   if (!cur || answered) return;
-  answered = true;
   const { verb, form } = cur;
   const ans = conjugate(verb, form);
   const ansR = conjugateReading(verb, form);
+  // 防呆：算不出正確答案就跳過這題，不顯示錯誤內容
+  if (!ans) { pickQuestion(); return; }
+  answered = true;
   const formLabel = FORMS.find(f => f.key===form).label;
   cardEl.innerHTML = `
     <div class="q-form">${verb.dict} 的 ${formLabel}</div>
