@@ -34,11 +34,12 @@
   .nav { font-size:0.85rem; margin-top:4px; }
   .nav a { color:var(--muted); text-decoration:none; margin-right:14px; }
   .nav a.here { color:var(--accent); font-weight:600; }
-  .tabs { display:flex; gap:6px; margin:16px 0 10px; }
+  .tabs { display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 10px; }
   .tab {
-    flex:1; text-align:center; padding:8px; border-radius:10px; cursor:pointer;
-    background:var(--tag-bg); color:var(--muted); font-size:0.9rem; user-select:none;
+    flex:1 1 auto; min-width:calc(50% - 3px); text-align:center; padding:8px 6px; border-radius:10px; cursor:pointer;
+    background:var(--tag-bg); color:var(--muted); font-size:0.88rem; user-select:none;
   }
+  @media (min-width:560px) { .tab { min-width:0; } }
   .tab.active { background:var(--accent); color:#fff; }
   .panel { display:none; } .panel.active { display:block; }
 
@@ -136,6 +137,29 @@
   .mistake-form { font-size:0.75rem; color:var(--muted); margin-top:2px; }
   .mistake-count { flex:0 0 auto; font-size:0.72rem; background:var(--bad); color:#fff; padding:3px 9px; border-radius:999px; }
   .empty-mistakes { text-align:center; color:var(--muted); padding:50px 20px; font-size:0.92rem; }
+
+  /* 段對照表 */
+  table.onbin.dan td, table.onbin.dan th { font-size:0.78rem; padding:5px 7px; }
+  table.onbin.dan td.form { vertical-align:middle; text-align:center; font-weight:700; background:var(--tag-bg); }
+
+  /* 用法例句 */
+  details.sec.usage { background:var(--card); border:1px solid var(--border); border-radius:12px; margin-top:10px; padding:0 14px; }
+  details.sec.usage > summary { padding:12px 0; font-size:0.92rem; color:var(--text); }
+  details.sec.usage[open] > summary { border-bottom:1px solid var(--border); }
+  .dan-tag { font-size:0.68rem; padding:2px 7px; border-radius:5px; color:#fff; font-weight:700; flex:0 0 auto; }
+  .dan-tag.a { background:#c0563f; } .dan-tag.i { background:#4a8c6f; }
+  .dan-tag.u { background:#7a6cc0; } .dan-tag.e { background:#c08a3f; } .dan-tag.o { background:#3f7dd4; }
+  .u-body { padding:10px 0 14px; }
+  .u-use { font-size:0.86rem; color:var(--muted); margin-bottom:8px; line-height:1.6; }
+  ul.ex { list-style:none; padding:0; margin:0; }
+  ul.ex li { padding:8px 0; border-bottom:1px dashed var(--border); font-size:0.95rem; }
+  ul.ex li:last-child { border-bottom:none; }
+  ul.ex li b { color:var(--accent); }
+  .tr { display:block; font-size:0.82rem; color:var(--muted); margin-top:2px; }
+  .u-warn { margin-top:10px; font-size:0.82rem; color:var(--bad); background:var(--accent-soft); padding:8px 10px; border-radius:8px; }
+  body.work .dan-tag { background:#666 !important; }
+  body.work ul.ex li b { color:#202020; }
+  body.work .u-warn { background:#f6f6f6; color:#555; }
 </style>
 </head>
 <body>
@@ -148,6 +172,7 @@
   <div class="tabs">
     <div class="tab active" data-panel="quiz">翻卡測驗</div>
     <div class="tab" data-panel="ref">變化速記表</div>
+    <div class="tab" data-panel="usage">用法例句</div>
     <div class="tab" data-panel="mistakes">錯題本 <span id="mistakeCount" class="cnt-badge"></span></div>
   </div>
 
@@ -266,11 +291,258 @@
       <div class="mini">記憶鉤：① た形＝把て形的「て→た・で→だ」換掉 ② ぬ・む・ぶ 都是嘴唇閉起來的鼻音→一起變「んで」 ③ 濁點（ぐ）保留→「いで」</div>
     </div>
 
+    <div class="sec-h">五段變化總表：哪一段 → 接什麼？（N4範圍）</div>
+    <div class="ref-note">
+      語尾假名在<b>同一行</b>上下移動，移到哪一段就決定能接什麼。以下用 <b>飲む（のむ）</b> 為例，「む」在<b>ま行</b>上下走：
+      <div class="tbl-wrap">
+        <table class="onbin dan">
+          <tr><th>段</th><th>變成</th><th>接續</th><th>形態</th><th>例</th></tr>
+          <tr><td class="form" rowspan="4">あ段</td><td rowspan="4">のま</td><td>ない</td><td>否定形</td><td>飲まない</td></tr>
+          <tr><td>なかった</td><td>過去否定</td><td>飲まなかった</td></tr>
+          <tr><td>れる</td><td>受身（被動）</td><td>飲まれる</td></tr>
+          <tr><td>せる</td><td>使役（讓/使）</td><td>飲ませる</td></tr>
+
+          <tr><td class="form" rowspan="5">い段</td><td rowspan="5">のみ</td><td>ます</td><td>丁寧形</td><td>飲みます</td></tr>
+          <tr><td>たい</td><td>想要～</td><td>飲みたい</td></tr>
+          <tr><td>ながら</td><td>一邊～</td><td>飲みながら</td></tr>
+          <tr><td>やすい／にくい</td><td>容易／難～</td><td>飲みやすい</td></tr>
+          <tr><td>すぎる</td><td>過度～</td><td>飲みすぎる</td></tr>
+
+          <tr><td class="form" rowspan="3">う段</td><td rowspan="3">のむ</td><td>（原形本身）</td><td>辭書形・常體</td><td>飲む</td></tr>
+          <tr><td>（直接接名詞）</td><td>連體修飾</td><td>飲む人</td></tr>
+          <tr><td>な</td><td>禁止（不准～）</td><td>飲むな</td></tr>
+
+          <tr><td class="form" rowspan="3">え段</td><td rowspan="3">のめ</td><td>る</td><td>可能形（能～）</td><td>飲める</td></tr>
+          <tr><td>ば</td><td>假定形（如果）</td><td>飲めば</td></tr>
+          <tr><td>（單獨使用）</td><td>命令形</td><td>飲め！</td></tr>
+
+          <tr><td class="form">お段</td><td>のも</td><td>う</td><td>意向形（～吧）</td><td>飲もう</td></tr>
+        </table>
+      </div>
+      <div class="mini">
+        <b>★ 記憶訣竅</b>：あ段＝<b>不要/被動使役</b>　い段＝<b>禮貌/想要</b>　う段＝<b>原形不加東西</b>　え段＝<b>能夠/如果/命令</b>　お段＝<b>一起吧</b>
+      </div>
+      <div class="mini">
+        <b>⚠ 兩個注意</b>：① <b>て形／た形不照這個段規律</b>，它們來自い段但發生音便（見上方音便表），要另外背。
+        ② <b>あ段的例外</b>：語尾「う」的動詞要變<b>わ</b>不是あ —— 買う→買<b>わ</b>ない（○）／買あない（✗），因為現代日文わ行只剩「わ」。
+      </div>
+    </div>
+
     <div class="sec-h">六形態對照（判斷正確後就全解鎖）</div>
     <div class="tbl-wrap">
       <table id="refTable"></table>
     </div>
     <div class="ref-note tail"><b>先分類，再變化</b> —— 判斷正確後，套上該類規則，六種形態就全部解鎖了！</div>
+  </div>
+
+  <!-- 用法例句 -->
+  <div class="panel" id="panel-usage">
+    <div class="ref-note intro">
+      <b>每種變化「什麼時候用」</b>
+      <div class="steps3">知道怎麼變 → 還要知道用在哪。點標題展開例句。</div>
+    </div>
+
+    <details class="sec usage" open>
+      <summary><span class="dan-tag a">あ段</span> ない形（否定）</summary>
+      <div class="u-body">
+        <div class="u-use">用來否定動作：「不～」。常體是 ない，丁寧體是 ません。</div>
+        <ul class="ex">
+          <li>お酒は<b>飲まない</b>。<span class="tr">我不喝酒。</span></li>
+          <li>今日は<b>行かない</b>つもりです。<span class="tr">今天不打算去。</span></li>
+          <li><b>買わない</b>方がいいよ。<span class="tr">不買比較好喔。（う→わ 的例外）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag a">あ段</span> なかった形（過去否定）</summary>
+      <div class="u-body">
+        <div class="u-use">ない形的「ない」換成「なかった」＝過去沒有做。</div>
+        <ul class="ex">
+          <li>昨日は何も<b>食べなかった</b>。<span class="tr">昨天什麼都沒吃。</span></li>
+          <li>誰も<b>来なかった</b>。<span class="tr">誰都沒來。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag a">あ段</span> 受身形（被動）〜れる／られる</summary>
+      <div class="u-body">
+        <div class="u-use">「被～」。動作的承受者當主語，做動作的人用 <b>に</b> 標示。日文的被動常帶「困擾/受害」語感。</div>
+        <ul class="ex">
+          <li>先生に<b>褒められた</b>。<span class="tr">被老師稱讚了。</span></li>
+          <li>雨に<b>降られて</b>、濡れた。<span class="tr">被雨淋了，濕透了。（受害的被動）</span></li>
+          <li>お菓子を弟に<b>食べられた</b>。<span class="tr">點心被弟弟吃掉了。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag a">あ段</span> 使役形（讓/使）〜せる／させる</summary>
+      <div class="u-body">
+        <div class="u-use">「讓某人做～」。被指使的人用 <b>に</b>（他動詞）或 <b>を</b>（自動詞）。含強制或許可兩種語感。</div>
+        <ul class="ex">
+          <li>母は妹に部屋を<b>掃除させた</b>。<span class="tr">媽媽讓妹妹打掃房間。（強制）</span></li>
+          <li>子供を<b>遊ばせる</b>。<span class="tr">讓孩子玩。（許可，自動詞用を）</span></li>
+          <li>ちょっと<b>考えさせて</b>ください。<span class="tr">請讓我想一下。（使役＋てください＝請求許可）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag i">い段</span> ます形（丁寧）</summary>
+      <div class="u-body">
+        <div class="u-use">禮貌體，對不熟的人、長輩、正式場合用。</div>
+        <ul class="ex">
+          <li>毎朝コーヒーを<b>飲みます</b>。<span class="tr">每天早上喝咖啡。</span></li>
+          <li>明日<b>行きません</b>。<span class="tr">明天不去。（丁寧的否定）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag i">い段</span> 〜たい（想要做）</summary>
+      <div class="u-body">
+        <div class="u-use">表達自己的願望。變化像い形容詞（たい→たくない／たかった）。<b>只能講自己</b>，講別人要用「たがっている」。</div>
+        <ul class="ex">
+          <li>日本へ<b>行きたい</b>。<span class="tr">我想去日本。</span></li>
+          <li>何も<b>食べたくない</b>。<span class="tr">什麼都不想吃。</span></li>
+          <li>弟は犬を<b>飼いたがっている</b>。<span class="tr">弟弟想養狗。（講別人）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag i">い段</span> 〜ながら（一邊～一邊）</summary>
+      <div class="u-body">
+        <div class="u-use">同一個人同時做兩件事。<b>主要動作放在後面</b>。</div>
+        <ul class="ex">
+          <li>音楽を<b>聞きながら</b>勉強する。<span class="tr">一邊聽音樂一邊唸書。（重點是唸書）</span></li>
+          <li><b>歩きながら</b>スマホを見るのは危ない。<span class="tr">邊走邊看手機很危險。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag i">い段</span> 〜やすい／〜にくい（容易／難）</summary>
+      <div class="u-body">
+        <div class="u-use">表示「好不好做」。變化像い形容詞。</div>
+        <ul class="ex">
+          <li>この薬は<b>飲みやすい</b>。<span class="tr">這個藥很好吞。</span></li>
+          <li>この字は<b>読みにくい</b>。<span class="tr">這個字很難讀。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag i">い段</span> 〜すぎる（過度）</summary>
+      <div class="u-body">
+        <div class="u-use">做得太over了，帶負面語感。變成2類動詞（すぎる→すぎます）。</div>
+        <ul class="ex">
+          <li>昨日は<b>飲みすぎた</b>。<span class="tr">昨天喝太多了。</span></li>
+          <li><b>食べすぎない</b>ように。<span class="tr">別吃太多。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag u">音便</span> て形（連接・請求・進行）</summary>
+      <div class="u-body">
+        <div class="u-use">用途最廣的一形：連接句子、請求、表進行、許可等。<b>不照段規律，走音便</b>。</div>
+        <ul class="ex">
+          <li>ご飯を<b>食べて</b>、寝た。<span class="tr">吃了飯就睡了。（連接動作）</span></li>
+          <li>ちょっと<b>待って</b>ください。<span class="tr">請等一下。（請求）</span></li>
+          <li>今、本を<b>読んでいる</b>。<span class="tr">我正在看書。（進行）</span></li>
+          <li>ここに座っ<b>てもいい</b>ですか。<span class="tr">可以坐這裡嗎？（許可）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag u">音便</span> た形（過去）</summary>
+      <div class="u-body">
+        <div class="u-use">常體過去式（＝ました的常體）。也用在「〜たことがある」等句型。</div>
+        <ul class="ex">
+          <li>昨日、映画を<b>見た</b>。<span class="tr">昨天看了電影。</span></li>
+          <li>日本へ<b>行った</b>ことがある。<span class="tr">我去過日本。（經驗）</span></li>
+          <li><b>食べた</b>後で、歯を磨く。<span class="tr">吃完後刷牙。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag u">う段</span> 辭書形（原形）・連體修飾</summary>
+      <div class="u-body">
+        <div class="u-use">字典上的形。當常體用、直接修飾名詞、也是很多句型的接續點。</div>
+        <ul class="ex">
+          <li>毎日コーヒーを<b>飲む</b>。<span class="tr">每天喝咖啡。（常體）</span></li>
+          <li>お酒を<b>飲む</b>人。<span class="tr">喝酒的人。（連體修飾，直接接名詞不用の）</span></li>
+          <li>日本語を話す<b>ことができる</b>。<span class="tr">會說日文。</span></li>
+          <li>寝る<b>前に</b>歯を磨く。<span class="tr">睡前刷牙。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag u">う段</span> 〜な（禁止）</summary>
+      <div class="u-body">
+        <div class="u-use">原形＋な＝「不准～」。語氣<b>非常強硬</b>，多為男性、上對下、警告標語。</div>
+        <ul class="ex">
+          <li>ここで<b>遊ぶな</b>！<span class="tr">不准在這裡玩！</span></li>
+          <li>心配<b>するな</b>。<span class="tr">別擔心。（也可用於安慰）</span></li>
+        </ul>
+        <div class="u-warn">⚠ 對長輩/不熟的人不能用，要說「〜ないでください」。</div>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag e">え段</span> 可能形（能夠）〜える／られる</summary>
+      <div class="u-body">
+        <div class="u-use">表示能力或可能性。<b>對象用 が 不用 を</b>。變化後一律是2類動詞。</div>
+        <ul class="ex">
+          <li>日本語<b>が</b>少し<b>話せる</b>。<span class="tr">我會說一點日文。</span></li>
+          <li>アルバイト代<b>が</b>20日に<b>もらえます</b>。<span class="tr">20號能領到打工費。</span></li>
+          <li>辛いもの<b>が</b><b>食べられない</b>。<span class="tr">我不能吃辣。</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag e">え段</span> 假定形 〜ば（如果）</summary>
+      <div class="u-body">
+        <div class="u-use">條件句「如果～的話」。強調<b>條件成立就會有某結果</b>，也常用在建議。</div>
+        <ul class="ex">
+          <li>薬を<b>飲めば</b>、よくなる。<span class="tr">吃了藥的話就會好。</span></li>
+          <li>どう<b>すれば</b>いいですか。<span class="tr">該怎麼做才好？（超常用）</span></li>
+          <li>安ければ買います。<span class="tr">便宜的話我就買。（い形容詞也有ば形）</span></li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag e">え段</span> 命令形（給我做！）</summary>
+      <div class="u-body">
+        <div class="u-use">最直接強硬的命令。日常幾乎不用，多見於<b>吵架、運動場、標語、漫畫台詞</b>。</div>
+        <ul class="ex">
+          <li>早く<b>来い</b>！<span class="tr">快點過來！（来る的命令形）</span></li>
+          <li>勝手に<b>しろ</b>。<span class="tr">隨你便。（する的命令形）</span></li>
+          <li><b>頑張れ</b>！<span class="tr">加油！（這個是正面用法，很常見）</span></li>
+        </ul>
+        <div class="u-warn">⚠ 除了「頑張れ」這類加油話，平常對人別用，會非常失禮。</div>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag o">お段</span> 意向形（～吧）〜おう／よう</summary>
+      <div class="u-body">
+        <div class="u-use">邀約「一起～吧」或表達自己的打算。丁寧版是「〜ましょう」。</div>
+        <ul class="ex">
+          <li>一緒に<b>飲もう</b>。<span class="tr">一起喝吧。（邀約）</span></li>
+          <li>そろそろ<b>帰ろう</b>か。<span class="tr">差不多該回去了吧？</span></li>
+          <li>留学<b>しようと思っている</b>。<span class="tr">我打算去留學。（意向形＋と思う＝表打算）</span></li>
+        </ul>
+      </div>
+    </details>
   </div>
 
   <!-- 錯題本 -->
