@@ -165,6 +165,11 @@
   table.onbin.pickt b { color:var(--accent); }
   body.work .pick { background:#f6f6f6; }
   body.work table.onbin.pickt b { color:#202020; }
+  .u-warn.warn-key { border-left:4px solid var(--bad); line-height:1.7; }
+  .u-warn.warn-key b { color:var(--bad); }
+  .bad-note { display:block; color:var(--bad); font-size:0.8rem; margin-top:3px; }
+  body.work .u-warn.warn-key { border-left-color:#666; }
+  body.work .u-warn.warn-key b, body.work .bad-note { color:#555; }
   body.work .dan-tag { background:#666 !important; }
   body.work ul.ex li b { color:#202020; }
   body.work .u-warn { background:#f6f6f6; color:#555; }
@@ -386,11 +391,57 @@
             <tr><td class="form">3類</td><td>不規則</td><td>する→<b>される</b>／来る→<b>来られる</b></td></tr>
           </table>
         </div>
+        <div class="u-warn warn-key">
+          ⚠ <b>最容易誤讀的一點：「に」標示的是「做動作的人」，不是被害者！</b><br>
+          看到「弟<b>に</b>」不要讀成「弟弟被…」，而是「<b>被弟弟…</b>」。<b>に 前面的人＝加害者</b>。
+        </div>
+        <div class="pick">
+          <div class="pick-h">完整句型（主語常省略，所以更容易誤讀）</div>
+          <table class="onbin pickt">
+            <tr><th>成分</th><th>助詞</th><th>角色</th></tr>
+            <tr><td class="form">被害者／被做的東西</td><td><b>は／が</b></td><td>句子的主角（常被省略）</td></tr>
+            <tr><td class="form">做動作的人</td><td><b>に</b></td><td>加害者 ←<b>就是這個</b></td></tr>
+            <tr><td class="form">動詞</td><td>—</td><td>〜れる／られる</td></tr>
+          </table>
+        </div>
         <ul class="ex">
-          <li>先生に<b>褒められた</b>。<span class="tr">被老師稱讚了。（2類：褒める→褒められる）</span></li>
-          <li>雨に<b>降られて</b>、濡れた。<span class="tr">被雨淋了，濕透了。（1類：降る→降られる／受害的被動）</span></li>
-          <li>お菓子を弟に<b>食べられた</b>。<span class="tr">點心被弟弟吃掉了。（2類）</span></li>
+          <li>お菓子<b>は</b>弟<b>に</b>食べられた。<span class="tr">點心被弟弟吃掉了。<br><span class="bad-note">✗ 不是「弟弟被吃掉」！お菓子＝被吃的東西，弟＝吃的人</span></span></li>
+          <li>私<b>は</b>先生<b>に</b>褒められた。<span class="tr">我被老師稱讚了。（先生＝稱讚的人）</span></li>
+          <li>（私は）犬<b>に</b>手<b>を</b>噛まれた。<span class="tr">我的手被狗咬了。（犬＝咬的一方）</span></li>
         </ul>
+      </div>
+    </details>
+
+    <details class="sec usage">
+      <summary><span class="dan-tag a">あ段</span> ⚠ 受身的三個「中文沒有」的難點</summary>
+      <div class="u-body">
+        <div class="u-use">這三種日文被動，用中文直覺翻會卡住，要另外理解：</div>
+
+        <div class="sub-h">① 所有物被動：受害的「人」當主語</div>
+        <div class="u-use">中文說「<b>我的</b>錢包被偷了」，日文卻把「<b>我</b>」當主語，被偷的東西用 <b>を</b>：</div>
+        <ul class="ex">
+          <li>私<b>は</b>財布<b>を</b>盗まれた。<span class="tr">我的錢包被偷了。<br><span class="bad-note">直譯像「我被偷了錢包」——日文重視「誰受到影響」</span></span></li>
+          <li>弟<b>に</b>お菓子<b>を</b>食べられた。<span class="tr">（我的）點心被弟弟吃掉了。<br><span class="bad-note">主語「我」省略了，只剩「被弟弟」＋「吃掉點心」</span></span></li>
+        </ul>
+
+        <div class="sub-h">② 迷惑（受害）被動：連自動詞都能變被動</div>
+        <div class="u-use">明明沒有人「對我做什麼」，但因為某事發生而<b>受到困擾</b>，中文完全沒有這種說法：</div>
+        <ul class="ex">
+          <li>雨<b>に</b>降られた。<span class="tr">被雨淋了（因下雨而困擾）。<br><span class="bad-note">雨不是故意針對我，但日文用被動表達「我受害」</span></span></li>
+          <li>友達<b>に</b>来られて、勉強できなかった。<span class="tr">朋友來了（害我）沒辦法唸書。<br><span class="bad-note">「朋友來」本身不是壞事，用被動＝表達我的困擾</span></span></li>
+        </ul>
+
+        <div class="sub-h">③ 2類動詞：受身和可能長得一模一樣</div>
+        <div class="u-use"><b>食べられる</b> 既是「被吃」也是「能吃」。靠<b>助詞</b>和<b>語境</b>分辨：</div>
+        <div class="tbl-wrap">
+          <table class="onbin pickt">
+            <tr><th></th><th>可能（能吃）</th><th>受身（被吃）</th></tr>
+            <tr><td class="form">關鍵助詞</td><td>對象用 <b>が</b></td><td>加害者用 <b>に</b></td></tr>
+            <tr><td class="form">例</td><td>刺身<b>が</b>食べられる<br>（我）能吃生魚片</td><td>猫<b>に</b>刺身を食べられた<br>生魚片被貓吃了</td></tr>
+            <tr><td class="form">判斷法</td><td>句中<b>沒有</b>「誰做的」</td><td>句中<b>有</b>「〜に」的人/動物</td></tr>
+          </table>
+        </div>
+        <div class="mini"><b>快速判斷</b>：句子裡出現「<b>◯◯に</b>」而且◯◯是人或動物 → 幾乎都是<b>受身</b>；只有「<b>◯◯が</b>」沒有動作者 → 是<b>可能</b>。</div>
       </div>
     </details>
 
@@ -407,10 +458,16 @@
             <tr><td class="form">3類</td><td>不規則</td><td>する→<b>させる</b>／来る→<b>来させる</b></td></tr>
           </table>
         </div>
+        <div class="u-warn warn-key">
+          ⚠ <b>被使喚的人用 に 還是 を？看動詞有沒有受詞</b><br>
+          有受詞（他動詞）→ 人用 <b>に</b>：妹<b>に</b>部屋<b>を</b>掃除させた（叫妹妹打掃房間）<br>
+          沒受詞（自動詞）→ 人用 <b>を</b>：子供<b>を</b>遊ばせる（讓孩子玩）
+          <div class="mini" style="margin-top:6px;">理由：一個句子裡通常只放一個「を」，受詞已經佔走を，人就只能用に。</div>
+        </div>
         <ul class="ex">
-          <li>母は妹に部屋を<b>掃除させた</b>。<span class="tr">媽媽讓妹妹打掃房間。（強制）</span></li>
-          <li>子供を<b>遊ばせる</b>。<span class="tr">讓孩子玩。（許可，自動詞用を）</span></li>
-          <li>ちょっと<b>考えさせて</b>ください。<span class="tr">請讓我想一下。（使役＋てください＝請求許可）</span></li>
+          <li>母は妹<b>に</b>部屋<b>を</b><b>掃除させた</b>。<span class="tr">媽媽叫妹妹打掃房間。（強制／他動詞：人用に）</span></li>
+          <li>子供<b>を</b><b>遊ばせる</b>。<span class="tr">讓孩子玩。（許可／自動詞：人用を）</span></li>
+          <li>ちょっと<b>考えさせて</b>ください。<span class="tr">請讓我想一下。<br><span class="bad-note">使役＋てください＝「請允許我做」，是請求許可，不是叫對方做</span></span></li>
         </ul>
       </div>
     </details>
@@ -429,7 +486,12 @@
           </table>
         </div>
         <div class="mini"><b>記憶鉤</b>：<b>れ</b>る＝被（有「れ」就是我承受）／<b>せ</b>る＝使（有「せ」就是我使喚別人）。看到尾巴是 れ 還是 せ 就能分辨。</div>
-        <div class="u-warn">⚠ 2類動詞的<b>受身</b>和<b>可能</b>長得一模一樣（食べ<b>られる</b>＝「被吃」也是「能吃」），只能靠上下文和助詞判斷：能吃用 <b>が</b>（刺身が食べられる），被吃用 <b>に</b>（弟に食べられた）。</div>
+        <div class="u-warn warn-key">
+          ⚠ <b>兩者都用「に」，但に的角色相反！</b><br>
+          受身的「◯◯に」＝<b>對我做動作的人</b>（加害者）：母<b>に</b>怒られた（<b>被</b>媽媽罵）<br>
+          使役的「◯◯に」＝<b>我叫他做事的人</b>（被使喚者）：妹<b>に</b>掃除させた（<b>叫</b>妹妹打掃）
+          <div class="mini" style="margin-top:6px;">判斷順序：先看<b>動詞尾巴</b>（れ＝被／せ＝使），再回頭決定「に」是誰。<b>別先看に猜</b>。</div>
+        </div>
       </div>
     </details>
 
