@@ -247,6 +247,33 @@
   body.work .f3n, body.work .ch-l b { color:#202020; }
   .mini.xref { background:var(--accent-soft); padding:8px 11px; border-radius:8px; margin-top:10px; color:var(--text); }
   body.work .mini.xref { background:#f6f6f6; color:#555; }
+
+  /* ===== 測驗：題型與級別 ===== */
+  .qtype-badge {
+    display:inline-block; font-size:0.68rem; padding:3px 10px; border-radius:999px;
+    background:var(--accent-soft); color:var(--accent); font-weight:700; margin-bottom:10px;
+  }
+  .lv { font-size:0.6rem; padding:1px 5px; border-radius:4px; margin-right:5px; font-weight:700; opacity:0.85; }
+  .lv-N5 { background:#4a8c6f; color:#fff; }
+  .lv-N4 { background:#c08a3f; color:#fff; }
+  .chip.on .lv { background:rgba(255,255,255,0.3); }
+  .presets { display:flex; flex-wrap:wrap; gap:5px; margin:6px 0 8px; }
+  .pbtn {
+    font-size:0.72rem; padding:4px 10px; border-radius:7px; cursor:pointer;
+    background:transparent; border:1px solid var(--border); color:var(--muted);
+  }
+  .pbtn:hover { border-color:var(--accent); color:var(--accent); }
+  .a-note {
+    margin-top:12px; font-size:0.82rem; color:var(--muted); line-height:1.65;
+    background:var(--tag-bg); padding:9px 12px; border-radius:9px; text-align:left;
+  }
+  .mq-tag {
+    display:inline-block; font-size:0.62rem; padding:1px 7px; border-radius:999px;
+    background:var(--accent-soft); color:var(--accent); margin-right:6px; font-weight:700;
+  }
+  body.work .qtype-badge, body.work .mq-tag { background:#eee; color:#555; }
+  body.work .lv-N5, body.work .lv-N4 { background:#999; }
+  body.work .a-note { background:#f6f6f6; }
   body.work .dan-tag { background:#666 !important; }
   body.work ul.ex li b { color:#202020; }
   body.work .u-warn { background:#f6f6f6; color:#555; }
@@ -269,8 +296,19 @@
   <!-- 翻卡 -->
   <div class="panel active" id="panel-quiz">
     <div class="opts">
-      <div class="lbl">要練哪些變化形（點選開關）</div>
+      <div class="lbl">① 題型（點選開關）</div>
+      <div class="chips" id="typeChips"></div>
+
+      <div class="lbl" style="margin-top:14px;">② 要練哪些變化形</div>
+      <div class="presets">
+        <button class="pbtn" data-preset="basic">基礎5項</button>
+        <button class="pbtn" data-preset="n5">N5全部</button>
+        <button class="pbtn" data-preset="n4">N4全部</button>
+        <button class="pbtn" data-preset="all">全選</button>
+        <button class="pbtn" data-preset="none">清除</button>
+      </div>
       <div class="chips" id="formChips"></div>
+
       <div class="srcrow">
         <label><input type="checkbox" id="srcBuiltin" checked> 內建 N4 動詞庫</label>
         <label><input type="checkbox" id="srcMine" checked> 我學習記錄裡的動詞</label>
@@ -844,6 +882,15 @@ function buildPool() {
   if (!POOL.length) POOL = N4_VERBS.slice();
 }
 
+// ===== 題型定義 =====
+const QUIZ_TYPES = [
+  { key:"conjugate",  label:"變化題",   hint:"看動詞＋形態，說出變化後" },
+  { key:"reverse",    label:"逆推題",   hint:"看變化後的形，說出原形" },
+  { key:"identify",   label:"辨識題",   hint:"看變化後的形，說出這是什麼形" },
+  { key:"classify",   label:"分類題",   hint:"判斷動詞是第幾類" },
+  { key:"resultType", label:"詞性題",   hint:"接完之後變成什麼詞性" }
+];
+
 // ===== 出題 =====
 let cur = null;
 let answered = false; // 目前這題是否已翻開答案
@@ -853,54 +900,149 @@ const missQueue = []; // 錯題稍後重來（優先再出）
 const typeLabel = { godan:"1類·五段", ichidan:"2類·一段", suru:"3類·する", kuru:"3類·来る" };
 const cardEl = document.getElementById("card");
 
+// 分類的判斷理由
+function classifyReason(v) {
+  if (v.type === "suru") return "以「する」結尾 → 3類（不規則）";
+  if (v.type === "kuru") return "「来る」→ 3類（不規則），讀音 く→き→こ 會變";
+  const r = v.reading;
+  if (v.type === "ichidan") return "結尾「る」且前一個音在い段或え段（" + r.slice(-2,-1) + "）→ 2類";
+  if (!r.endsWith("る")) return "結尾是「" + r.slice(-1) + "」（不是る）→ 1類";
+  return "結尾雖是「る」，但屬於例外1類（長得像2類其實是1類），要直接背";
+}
+
+// 找出這個動詞裡與 target 同形的其他變化形（用於辨識題的同形提醒）
+function sameShapeForms(verb, targetForm) {
+  const target = conjugate(verb, targetForm);
+  return FORMS.filter(f => f.key !== targetForm && conjugate(verb, f.key) === target);
+}
+
+function activeForms() {
+  return FORMS.filter(f => {
+    const el = document.querySelector('.chip[data-form="' + f.key + '"]');
+    return el && el.classList.contains("on");
+  }).map(f => f.key);
+}
+function activeTypes() {
+  return QUIZ_TYPES.filter(t => {
+    const el = document.querySelector('.chip[data-qtype="' + t.key + '"]');
+    return el && el.classList.contains("on");
+  }).map(t => t.key);
+}
+
 function pickQuestion() {
   buildPool();
   const forms = activeForms();
-  if (!forms.length) { cardEl.innerHTML = '<div class="hint">請至少選一個變化形</div>'; return; }
+  const types = activeTypes();
+  if (!types.length) { cardEl.innerHTML = '<div class="hint">請至少選一個題型</div>'; return; }
+  // 除了分類題，其他題型都需要至少一個變化形
+  const needForm = types.filter(t => t !== "classify");
+  if (needForm.length && !forms.length && !types.includes("classify")) {
+    cardEl.innerHTML = '<div class="hint">請至少選一個變化形</div>'; return;
+  }
+
   // 30% 機率優先出錯題
   if (missQueue.length && Math.random() < 0.35) {
     cur = missQueue.shift();
   } else {
+    let qtype = types[Math.floor(Math.random()*types.length)];
+    if (qtype !== "classify" && !forms.length) qtype = "classify";
     const v = POOL[Math.floor(Math.random()*POOL.length)];
-    const f = forms[Math.floor(Math.random()*forms.length)];
-    cur = { verb:v, form:f };
+    const f = forms.length ? forms[Math.floor(Math.random()*forms.length)] : "te";
+    cur = { qtype, verb:v, form:f };
   }
   answered = false;
   renderQuestion();
 }
 
+function qTypeBadge(qtype) {
+  const t = QUIZ_TYPES.find(x => x.key === qtype);
+  return '<div class="qtype-badge">' + (t ? t.label : "") + '</div>';
+}
+
 function renderQuestion() {
-  const { verb, form } = cur;
-  const formLabel = FORMS.find(f => f.key===form).label;
-  cardEl.innerHTML = `
-    <div class="q-form">變成 ${formLabel} ？</div>
-    <div class="q-verb">${verb.dict}</div>
-    <div class="q-reading">${verb.reading !== verb.dict ? verb.reading : ""}</div>
-    <div class="q-mean">${verb.meaning || ""}</div>
-    <div class="q-type">${typeLabel[verb.type]||""}${verb.fromMine?" · 我的記錄":""}</div>
-    <div class="hint">點卡片看答案</div>`;
+  const { qtype, verb, form } = cur;
+  const formLabel = FORMS.find(f => f.key===form) ? FORMS.find(f => f.key===form).label : "";
+  const meta = '<div class="q-type">' + (typeLabel[verb.type]||"") + (verb.fromMine?" · 我的記錄":"") + '</div>';
+  let html = qTypeBadge(qtype);
+
+  if (qtype === "conjugate") {
+    html += '<div class="q-form">變成 ' + formLabel + ' ？</div>' +
+      '<div class="q-verb">' + verb.dict + '</div>' +
+      '<div class="q-reading">' + (verb.reading !== verb.dict ? verb.reading : "") + '</div>' +
+      '<div class="q-mean">' + (verb.meaning || "") + '</div>' + meta;
+  } else if (qtype === "reverse") {
+    html += '<div class="q-form">這是哪個動詞變來的？原形是？</div>' +
+      '<div class="q-verb">' + conjugate(verb, form) + '</div>' +
+      '<div class="q-mean">（順便想想這是什麼形）</div>';
+  } else if (qtype === "identify") {
+    html += '<div class="q-form">這是什麼形？</div>' +
+      '<div class="q-verb">' + conjugate(verb, form) + '</div>' +
+      '<div class="q-mean">' + verb.dict + ' 的變化</div>' + meta;
+  } else if (qtype === "classify") {
+    html += '<div class="q-form">這是第幾類動詞？</div>' +
+      '<div class="q-verb">' + verb.dict + '</div>' +
+      '<div class="q-reading">' + (verb.reading !== verb.dict ? verb.reading : "") + '</div>' +
+      '<div class="q-mean">' + (verb.meaning || "") + '</div>';
+  } else if (qtype === "resultType") {
+    html += '<div class="q-form">接完之後變成什麼詞性？</div>' +
+      '<div class="q-verb" style="font-size:1.5rem">' + formLabel + '</div>' +
+      '<div class="q-mean">例：' + verb.dict + ' → ' + conjugate(verb, form) + '</div>';
+  }
+  html += '<div class="hint">點卡片看答案</div>';
+  cardEl.innerHTML = html;
 }
 
 function showAnswer() {
   if (!cur || answered) return;
-  const { verb, form } = cur;
+  const { qtype, verb, form } = cur;
+  const fObj = FORMS.find(f => f.key===form);
+  const formLabel = fObj ? fObj.label : "";
   const ans = conjugate(verb, form);
-  const ansR = conjugateReading(verb, form);
-  // 防呆：算不出正確答案就跳過這題，不顯示錯誤內容
-  if (!ans) { pickQuestion(); return; }
+  if (qtype !== "classify" && qtype !== "resultType" && !ans) { pickQuestion(); return; }
   answered = true;
-  const formLabel = FORMS.find(f => f.key===form).label;
-  cardEl.innerHTML = `
-    <div class="q-form">${verb.dict} 的 ${formLabel}</div>
-    <div class="q-verb" style="font-size:1.6rem;color:var(--muted)">${verb.dict}</div>
-    <div class="answer">
-      <div class="a-main">${ans}</div>
-      <div class="a-reading">${ansR !== ans ? ansR : ""}</div>
-    </div>
-    <div class="btns">
-      <button class="btn dunno" data-act="dunno">不會 / 錯</button>
-      <button class="btn know" data-act="know">會了</button>
-    </div>`;
+
+  let head = "", main = "", sub = "", note = "";
+
+  if (qtype === "conjugate") {
+    head = verb.dict + " 的 " + formLabel;
+    main = ans;
+    const ansR = conjugateReading(verb, form);
+    sub = (ansR !== ans ? ansR : "");
+  } else if (qtype === "reverse") {
+    head = ans + " 的原形";
+    main = verb.dict;
+    sub = (verb.reading !== verb.dict ? verb.reading : "");
+    note = "這是「" + formLabel + "」　／　" + (typeLabel[verb.type]||"");
+  } else if (qtype === "identify") {
+    const same = sameShapeForms(verb, form);
+    head = verb.dict + " → " + ans;
+    main = formLabel;
+    if (same.length) {
+      note = "⚠ 同形提醒：這個字也可以是「" + same.map(f=>f.label).join("、") + "」，要靠助詞和上下文分辨。";
+    }
+  } else if (qtype === "classify") {
+    head = verb.dict + "（" + verb.reading + "）";
+    main = typeLabel[verb.type] || "";
+    note = classifyReason(verb);
+  } else if (qtype === "resultType") {
+    const rt = RESULT_TYPES[fObj ? fObj.result : "x"];
+    head = formLabel;
+    main = rt ? rt.label : "";
+    note = (rt ? rt.desc : "") + "　例：" + verb.dict + " → " + ans;
+  }
+
+  cardEl.innerHTML =
+    qTypeBadge(qtype) +
+    '<div class="q-form">' + head + '</div>' +
+    '<div class="answer">' +
+      '<div class="a-main">' + main + '</div>' +
+      (sub ? '<div class="a-reading">' + sub + '</div>' : '') +
+    '</div>' +
+    (note ? '<div class="a-note">' + note + '</div>' : '') +
+    '<div class="btns">' +
+      '<button class="btn dunno" data-act="dunno">不會 / 錯</button>' +
+      '<button class="btn know" data-act="know">會了</button>' +
+    '</div>';
 }
 
 // 事件委派：卡片本身只綁定一次，永遠有效，不受重複 innerHTML 影響
@@ -920,7 +1062,8 @@ function grade(ok) {
 function updateScore() {
   const acc = stats.done ? Math.round(stats.know/stats.done*100) : 0;
   document.getElementById("score").textContent =
-    `本次 ${stats.done} 題　答對 ${stats.know}　正確率 ${acc}%` + (missQueue.length?`　待複習 ${missQueue.length}`:"");
+    "本次 " + stats.done + " 題　答對 " + stats.know + "　正確率 " + acc + "%" +
+    (missQueue.length ? "　待複習 " + missQueue.length : "");
 }
 
 // ===== 錯題本（localStorage 永久保存） =====
@@ -933,16 +1076,20 @@ function saveMistakes(list) {
   localStorage.setItem(MISTAKES_KEY, JSON.stringify(list));
   renderMistakeBadge(list);
 }
-function mistakeKey(q) { return q.verb.dict + "|" + q.form; }
+function mistakeKey(q) { return (q.qtype||"conjugate") + "|" + q.verb.dict + "|" + q.form; }
 function recordMistake(q) {
   const list = loadMistakes();
   const key = mistakeKey(q);
   const existing = list.find(m => m.key === key);
   if (existing) { existing.count++; existing.lastMiss = Date.now(); }
   else {
+    const qtype = q.qtype || "conjugate";
+    const qt = QUIZ_TYPES.find(t => t.key === qtype);
+    const fObj = FORMS.find(f => f.key === q.form);
     list.push({
-      key, dict: q.verb.dict, reading: q.verb.reading, type: q.verb.type,
-      form: q.form, formLabel: FORMS.find(f=>f.key===q.form).label,
+      key, qtype, qtypeLabel: qt ? qt.label : "",
+      dict: q.verb.dict, reading: q.verb.reading, type: q.verb.type,
+      form: q.form, formLabel: fObj ? fObj.label : "",
       answer: conjugate(q.verb, q.form), answerReading: conjugateReading(q.verb, q.form),
       count: 1, lastMiss: Date.now()
     });
@@ -970,14 +1117,35 @@ function renderMistakePanel() {
     box.innerHTML = '<div class="empty-mistakes">目前沒有錯題，太強了 👍</div>';
     return;
   }
-  box.innerHTML = list.map(m => `
-    <div class="mistake-card">
-      <div class="mistake-main">
-        <div class="mistake-verb">${m.dict}<span class="arrow">→</span><span class="mistake-ans">${m.answer}</span></div>
-        <div class="mistake-form">${m.formLabel}${m.answerReading !== m.answer ? "　" + m.answerReading : ""}</div>
-      </div>
-      <div class="mistake-count">錯 ${m.count} 次</div>
-    </div>`).join("");
+  const typeLabelMap = { godan:"1類", ichidan:"2類", suru:"3類", kuru:"3類" };
+  box.innerHTML = list.map(m => {
+    let line = "", sub = "";
+    if (m.qtype === "classify") {
+      line = m.dict + '<span class="arrow">→</span><span class="mistake-ans">' + (typeLabelMap[m.type]||"") + '</span>';
+      sub = "判斷動詞類別";
+    } else if (m.qtype === "reverse") {
+      line = m.answer + '<span class="arrow">→</span><span class="mistake-ans">' + m.dict + '</span>';
+      sub = "逆推原形（" + m.formLabel + "）";
+    } else if (m.qtype === "identify") {
+      line = m.dict + " → " + m.answer + '<span class="arrow">＝</span><span class="mistake-ans">' + m.formLabel + '</span>';
+      sub = "辨識形態";
+    } else if (m.qtype === "resultType") {
+      const fo = FORMS.find(f => f.key === m.form);
+      const rt = fo && RESULT_TYPES[fo.result];
+      line = m.formLabel + '<span class="arrow">→</span><span class="mistake-ans">' + (rt ? rt.label : "") + '</span>';
+      sub = "結果詞性";
+    } else {
+      line = m.dict + '<span class="arrow">→</span><span class="mistake-ans">' + m.answer + '</span>';
+      sub = m.formLabel + (m.answerReading !== m.answer ? "　" + m.answerReading : "");
+    }
+    return '<div class="mistake-card">' +
+      '<div class="mistake-main">' +
+        '<div class="mistake-verb">' + line + '</div>' +
+        '<div class="mistake-form"><span class="mq-tag">' + (m.qtypeLabel || "變化題") + '</span>' + sub + '</div>' +
+      '</div>' +
+      '<div class="mistake-count">錯 ' + m.count + ' 次</div>' +
+    '</div>';
+  }).join("");
 }
 document.getElementById("clearMistakes").onclick = () => {
   if (!confirm("確定要清空錯題本嗎？")) return;
@@ -986,6 +1154,19 @@ document.getElementById("clearMistakes").onclick = () => {
 };
 renderMistakeBadge();
 
+// ===== 題型 chips =====
+const typeChipsBox = document.getElementById("typeChips");
+const DEFAULT_TYPES = ["conjugate"];
+QUIZ_TYPES.forEach(t => {
+  const el = document.createElement("span");
+  el.className = "chip" + (DEFAULT_TYPES.includes(t.key) ? " on" : "");
+  el.dataset.qtype = t.key;
+  el.title = t.hint;
+  el.textContent = t.label;
+  el.onclick = () => { el.classList.toggle("on"); };
+  typeChipsBox.appendChild(el);
+});
+
 // ===== 變化形選擇 chips =====
 const chipsBox = document.getElementById("formChips");
 const DEFAULT_ON = ["masu","te","ta","nai","nakatta"];
@@ -993,10 +1174,29 @@ FORMS.forEach(f => {
   const el = document.createElement("span");
   el.className = "chip" + (DEFAULT_ON.includes(f.key)?" on":"");
   el.dataset.form = f.key;
-  el.textContent = f.label;
+  el.dataset.level = f.level || "";
+  el.innerHTML = '<span class="lv lv-' + (f.level||"") + '">' + (f.level||"") + '</span>' + f.label;
   el.onclick = () => { el.classList.toggle("on"); };
   chipsBox.appendChild(el);
 });
+
+// 快捷預設
+document.querySelectorAll(".pbtn").forEach(b => {
+  b.onclick = () => {
+    const p = b.dataset.preset;
+    document.querySelectorAll("#formChips .chip").forEach(el => {
+      const f = FORMS.find(x => x.key === el.dataset.form);
+      let on = false;
+      if (p === "basic") on = DEFAULT_ON.includes(f.key);
+      else if (p === "n5") on = f.level === "N5";
+      else if (p === "n4") on = f.level === "N4";
+      else if (p === "all") on = true;
+      else if (p === "none") on = false;
+      el.classList.toggle("on", on);
+    });
+  };
+});
+
 document.getElementById("srcBuiltin").onchange = () => {};
 document.getElementById("srcMine").onchange = () => {};
 

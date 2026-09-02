@@ -11,18 +11,33 @@ const TE = { "う":"って","つ":"って","る":"って","ぬ":"んで","ぶ":"
 
 // 我們要測驗/展示的變化形（key 對應下面每個引擎分支）
 const FORMS = [
-  { key: "masu",       label: "ます形（丁寧）" },
-  { key: "te",         label: "て形" },
-  { key: "ta",         label: "た形（過去）" },
-  { key: "nai",        label: "ない形（否定）" },
-  { key: "nakatta",    label: "なかった形（過去否定）" },
-  { key: "potential",  label: "可能形（能夠）" },
-  { key: "volitional", label: "意向形（～よう）" },
-  { key: "passive",    label: "受身形（被動）" },
-  { key: "causative",  label: "使役形（讓/使）" },
-  { key: "imperative", label: "命令形" },
-  { key: "conditional",label: "假定形（～ば）" }
+  // 基礎（N5）
+  { key: "masu",       label: "ます形（丁寧）",       level: "N5", result: "sp" },
+  { key: "te",         label: "て形",                level: "N5", result: "x"  },
+  { key: "ta",         label: "た形（過去）",         level: "N5", result: "x"  },
+  { key: "nai",        label: "ない形（否定）",       level: "N5", result: "i"  },
+  { key: "nakatta",    label: "なかった形（過去否定）", level: "N5", result: "i" },
+  { key: "tai",        label: "たい形（想做）",       level: "N5", result: "i"  },
+  // N4
+  { key: "potential",  label: "可能形（能夠）",       level: "N4", result: "v2" },
+  { key: "volitional", label: "意向形（～よう）",     level: "N4", result: "x"  },
+  { key: "imperative", label: "命令形",              level: "N4", result: "x"  },
+  { key: "kinshi",     label: "禁止形（～な）",       level: "N4", result: "x"  },
+  { key: "conditional",label: "假定形（～ば）",       level: "N4", result: "x"  },
+  { key: "tara",       label: "たら形（如果～就）",    level: "N4", result: "x"  },
+  { key: "tari",       label: "たり形（列舉）",       level: "N4", result: "x"  },
+  { key: "passive",    label: "受身形（被動）",       level: "N4", result: "v2" },
+  { key: "causative",  label: "使役形（讓/使）",      level: "N4", result: "v2" },
+  { key: "causPass",   label: "使役受身形（被迫）",    level: "N4", result: "v2" }
 ];
+
+// 結果詞性的說明（用於文法理解題）
+const RESULT_TYPES = {
+  i:  { label: "い形容詞", desc: "之後照い形容詞變化：〜くない／〜かった／〜くて" },
+  v2: { label: "2類動詞",  desc: "之後照2類動詞變化：去る＋ます／ない／て／た" },
+  x:  { label: "到此為止", desc: "不再繼續變化（接續或終止用）" },
+  sp: { label: "自成一套", desc: "ます／ません／ました／ませんでした" }
+};
 
 function teToTa(te) { return te.slice(0, -1) + (te.endsWith("で") ? "だ" : "た"); }
 
@@ -35,14 +50,21 @@ function conjGodan(dict, form) {
   const teForm = (dict === "行く" || dict === "いく") ? stem + "って" : stem + TE[last];
   switch (form) {
     case "masu":        return stem + ROW_I[last] + "ます";
+    case "tai":         return stem + ROW_I[last] + "たい";
     case "te":          return teForm;
     case "ta":          return teToTa(teForm);
+    case "tara":        return teToTa(teForm) + "ら";
+    case "tari":        return teToTa(teForm) + "り";
     case "nai":         return stem + ROW_A[last] + "ない";
     case "potential":   return stem + ROW_E[last] + "る";
     case "volitional":  return stem + ROW_O[last] + "う";
     case "passive":     return stem + ROW_A[last] + "れる";
     case "causative":   return stem + ROW_A[last] + "せる";
+    // 使役受身：語尾「す」只能用〜せられる（話さされる 不自然），其餘用縮約的〜される
+    case "causPass":    return last === "す" ? stem + ROW_A[last] + "せられる"
+                                             : stem + ROW_A[last] + "される";
     case "imperative":  return stem + ROW_E[last];
+    case "kinshi":      return dict + "な";
     case "conditional": return stem + ROW_E[last] + "ば";
   }
 }
@@ -51,14 +73,19 @@ function conjIchidan(dict, form) {
   const base = dict.slice(0, -1); // 去掉る
   switch (form) {
     case "masu":        return base + "ます";
+    case "tai":         return base + "たい";
     case "te":          return base + "て";
     case "ta":          return base + "た";
+    case "tara":        return base + "たら";
+    case "tari":        return base + "たり";
     case "nai":         return base + "ない";
     case "potential":   return base + "られる";
     case "volitional":  return base + "よう";
     case "passive":     return base + "られる";
     case "causative":   return base + "させる";
+    case "causPass":    return base + "させられる";
     case "imperative":  return base + "ろ";
+    case "kinshi":      return dict + "な";
     case "conditional": return base + "れば";
   }
 }
@@ -67,9 +94,11 @@ function conjIchidan(dict, form) {
 function conjSuru(dict, form) {
   const pre = dict.slice(0, -2); // 去掉「する」
   const map = {
-    masu: "します", te: "して", ta: "した", nai: "しない",
+    masu: "します", tai: "したい", te: "して", ta: "した",
+    tara: "したら", tari: "したり", nai: "しない",
     potential: "できる", volitional: "しよう", passive: "される",
-    causative: "させる", imperative: "しろ", conditional: "すれば"
+    causative: "させる", causPass: "させられる",
+    imperative: "しろ", kinshi: "するな", conditional: "すれば"
   };
   return pre + map[form];
 }
@@ -77,14 +106,18 @@ function conjSuru(dict, form) {
 // 来る（不規則，讀音也變）— surface 用漢字，reading 用假名
 function conjKuru(form, useReading) {
   const s = { // 漢字表記
-    masu: "来ます", te: "来て", ta: "来た", nai: "来ない",
+    masu: "来ます", tai: "来たい", te: "来て", ta: "来た",
+    tara: "来たら", tari: "来たり", nai: "来ない",
     potential: "来られる", volitional: "来よう", passive: "来られる",
-    causative: "来させる", imperative: "来い", conditional: "来れば"
+    causative: "来させる", causPass: "来させられる",
+    imperative: "来い", kinshi: "来るな", conditional: "来れば"
   };
   const r = { // 假名讀音
-    masu: "きます", te: "きて", ta: "きた", nai: "こない",
+    masu: "きます", tai: "きたい", te: "きて", ta: "きた",
+    tara: "きたら", tari: "きたり", nai: "こない",
     potential: "こられる", volitional: "こよう", passive: "こられる",
-    causative: "こさせる", imperative: "こい", conditional: "くれば"
+    causative: "こさせる", causPass: "こさせられる",
+    imperative: "こい", kinshi: "くるな", conditional: "くれば"
   };
   return useReading ? r[form] : s[form];
 }
@@ -110,7 +143,9 @@ function conjugateReading(verb, form) {
   if (verb.type === "ichidan") return conjIchidan(verb.reading, form);
   if (verb.type === "suru") {
     const pre = verb.reading.slice(0, -2);
-    const map = { masu:"します",te:"して",ta:"した",nai:"しない",potential:"できる",volitional:"しよう",passive:"される",causative:"させる",imperative:"しろ",conditional:"すれば" };
+    const map = { masu:"します",tai:"したい",te:"して",ta:"した",tara:"したら",tari:"したり",
+      nai:"しない",potential:"できる",volitional:"しよう",passive:"される",
+      causative:"させる",causPass:"させられる",imperative:"しろ",kinshi:"するな",conditional:"すれば" };
     return pre + map[form];
   }
 }
