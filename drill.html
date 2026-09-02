@@ -274,6 +274,33 @@
   body.work .qtype-badge, body.work .mq-tag { background:#eee; color:#555; }
   body.work .lv-N5, body.work .lv-N4 { background:#999; }
   body.work .a-note { background:#f6f6f6; }
+  .jt-tag { font-size:0.66rem; padding:2px 8px; border-radius:999px; font-weight:700; }
+  .jt-i { background:#e8f0e4; color:#3d7a4a; }
+  .jt-t { background:#f8e4e4; color:#9e3333; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .jt-i { background:#22331f; color:#8ec49a; }
+    :root:not([data-theme="light"]) .jt-t { background:#3a1f1f; color:#e09090; }
+  }
+  :root[data-theme="dark"] .jt-i { background:#22331f; color:#8ec49a; }
+  :root[data-theme="dark"] .jt-t { background:#3a1f1f; color:#e09090; }
+  body.work .jt-tag { background:#eee !important; color:#555 !important; }
+  table.onbin.jt td { font-size:0.8rem; padding:5px 7px; }
+  table.onbin.jt td.j-i { color:#3d7a4a; font-weight:600; }
+  table.onbin.jt td.j-t { color:#9e3333; font-weight:600; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) table.onbin.jt td.j-i { color:#8ec49a; }
+    :root:not([data-theme="light"]) table.onbin.jt td.j-t { color:#e09090; }
+  }
+  :root[data-theme="dark"] table.onbin.jt td.j-i { color:#8ec49a; }
+  :root[data-theme="dark"] table.onbin.jt td.j-t { color:#e09090; }
+  body.work table.onbin.jt td.j-i, body.work table.onbin.jt td.j-t { color:#333; }
+  details.sec.pair-grp { background:var(--tag-bg); border-radius:10px; margin-top:8px; padding:0 12px; }
+  details.sec.pair-grp > summary { padding:10px 0; font-size:0.85rem; color:var(--text); font-weight:600; }
+  details.sec.pair-grp[open] > summary { border-bottom:1px solid var(--border); margin-bottom:8px; }
+  details.sec.pair-grp .tbl-wrap { margin-bottom:10px; }
+  table.onbin.jt th.j-i, table.onbin.jt th.j-t { font-weight:700; }
+  table.onbin.jt .th-s { font-size:0.68rem; font-weight:400; color:var(--muted); margin-top:1px; }
+  body.work details.sec.pair-grp { background:#f6f6f6; }
   body.work .dan-tag { background:#666 !important; }
   body.work ul.ex li b { color:#202020; }
   body.work .u-warn { background:#f6f6f6; color:#555; }
@@ -312,6 +339,7 @@
       <div class="srcrow">
         <label><input type="checkbox" id="srcBuiltin" checked> 內建 N4 動詞庫</label>
         <label><input type="checkbox" id="srcMine" checked> 我學習記錄裡的動詞</label>
+        <label><input type="checkbox" id="srcPairs" checked> 自他動詞組（48組）</label>
       </div>
     </div>
     <div class="card" id="card"></div>
@@ -782,6 +810,58 @@
       </div>
     </details>
 
+    <!-- 自他動詞 -->
+    <details class="sec grp">
+      <summary><span class="grp-tag g-a">自他動詞</span> 自動詞（が）⇄ 他動詞（を） <span class="cnt">48組</span></summary>
+      <div class="grp-body">
+        <div class="base-how">
+          <b>核心：不是換助詞，是換動詞。</b>日文有兩個長得像但不同的動詞配成一組——一個天生配 <b>が</b>，一個天生配 <b>を</b>。
+        </div>
+        <div class="tbl-wrap">
+          <table class="onbin pickt">
+            <tr><th></th><th class="j-i">自動詞</th><th class="j-t">他動詞</th></tr>
+            <tr><td class="form">句型</td><td>［東西］<b>が</b>＋動詞</td><td>［人］が［東西］<b>を</b>＋動詞</td></tr>
+            <tr><td class="form">焦點</td><td>東西怎麼了（結果/狀態）</td><td>誰做了什麼（動作/意圖）</td></tr>
+            <tr><td class="form">例</td><td>ドア<b>が</b>開いた<br><span class="tr">門開了（沒說是誰）</span></td><td>私がドア<b>を</b>開けた<br><span class="tr">我把門打開</span></td></tr>
+          </table>
+        </div>
+        <div class="uc-warn">
+          <b>★ 兩條秒判規則</b><br>
+          ① 語尾是「<b>す</b>」→ 幾乎都是<b>他動詞</b>（消す・壊す・出す・動かす・落とす・直す・倒す・汚す）<br>
+          ② 語尾是「<b>〜ある</b>」→ 幾乎都是<b>自動詞</b>（閉まる・始まる・集まる・変わる・決まる・上がる・見つかる）
+          <div class="mini" style="margin-top:6px;">語源：他動詞的 <b>s</b> 音自古就是「使役」標記（使某物變成某狀態）＝有人出手；自動詞的 <b>-ar-</b> 與「<b>ある</b>（存在）」同源＝處於某狀態。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">實用語感：自動詞可以淡化責任</div>
+          <ul class="ex">
+            <li>コップ<b>が割れました</b>。<span class="tr">杯子破了。（沒說是誰弄的）</span></li>
+            <li>コップ<b>を割りました</b>。<span class="tr">我把杯子打破了。（承認是我）</span></li>
+          </ul>
+          <div class="uc-note">日本人很常用自動詞不點名是誰做的，這是重要的社交語感。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">進階：ている vs てある（N4常考）</div>
+          <div class="tbl-wrap">
+            <table class="onbin pickt">
+              <tr><th></th><th>自動詞＋ている</th><th>他動詞＋てある</th></tr>
+              <tr><td class="form">意思</td><td>單純描述現在<b>狀態</b></td><td><b>有人刻意做了</b>並保持著</td></tr>
+              <tr><td class="form">例</td><td>電気<b>がついている</b><br><span class="tr">燈亮著</span></td><td>電気<b>がつけてある</b><br><span class="tr">燈被人開著（有目的）</span></td></tr>
+              <tr><td class="form">例</td><td>窓<b>が開いている</b><br><span class="tr">窗開著</span></td><td>窓<b>が開けてある</b><br><span class="tr">有人特意開著（如通風）</span></td></tr>
+            </table>
+          </div>
+          <div class="uc-note">差別在<b>有沒有人的意圖</b>：ている 只講狀態，てある 暗示某人做了且有理由。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">六組配對總表（按變化模式）</div>
+          <div class="uc-m">點下方展開完整清單。分組記比隨機背有效很多。</div>
+          <div id="pairTables"></div>
+        </div>
+      </div>
+    </details>
+
     <!-- 易混淆專區 -->
     <details class="sec grp danger">
       <summary><span class="grp-tag g-x">易混淆</span> 受身 vs 使役 vs 可能 <span class="cnt">3</span></summary>
@@ -875,10 +955,12 @@ async function loadMine() {
 function activeForms() {
   return FORMS.filter(f => document.querySelector(`.chip[data-form="${f.key}"]`).classList.contains("on")).map(f => f.key);
 }
+let pairPool = [];
 function buildPool() {
   POOL = [];
   if (document.getElementById("srcBuiltin").checked) POOL.push(...N4_VERBS);
   if (document.getElementById("srcMine").checked) POOL.push(...mineVerbs);
+  if (document.getElementById("srcPairs").checked) POOL.push(...pairPool);
   if (!POOL.length) POOL = N4_VERBS.slice();
 }
 
@@ -888,7 +970,9 @@ const QUIZ_TYPES = [
   { key:"reverse",    label:"逆推題",   hint:"看變化後的形，說出原形" },
   { key:"identify",   label:"辨識題",   hint:"看變化後的形，說出這是什麼形" },
   { key:"classify",   label:"分類題",   hint:"判斷動詞是第幾類" },
-  { key:"resultType", label:"詞性題",   hint:"接完之後變成什麼詞性" }
+  { key:"resultType", label:"詞性題",   hint:"接完之後變成什麼詞性" },
+  { key:"jita",       label:"自他題",   hint:"判斷是自動詞(が)還是他動詞(を)" },
+  { key:"pairFind",   label:"配對題",   hint:"說出配對的另一半（自↔他）" }
 ];
 
 // ===== 出題 =====
@@ -945,8 +1029,15 @@ function pickQuestion() {
     cur = missQueue.shift();
   } else {
     let qtype = types[Math.floor(Math.random()*types.length)];
-    if (qtype !== "classify" && !forms.length) qtype = "classify";
-    const v = POOL[Math.floor(Math.random()*POOL.length)];
+    const pairOnly = (qtype === "jita" || qtype === "pairFind");
+    // 自他題型必須用配對動詞；沒有配對池就換題型
+    if (pairOnly && !pairPool.length) {
+      const alt = types.filter(t => t !== "jita" && t !== "pairFind");
+      qtype = alt.length ? alt[Math.floor(Math.random()*alt.length)] : "classify";
+    }
+    if (qtype !== "classify" && qtype !== "jita" && qtype !== "pairFind" && !forms.length) qtype = "classify";
+    const src = (qtype === "jita" || qtype === "pairFind") ? pairPool : POOL;
+    const v = src[Math.floor(Math.random()*src.length)];
     const f = forms.length ? forms[Math.floor(Math.random()*forms.length)] : "te";
     cur = { qtype, verb:v, form:f };
   }
@@ -987,6 +1078,17 @@ function renderQuestion() {
     html += '<div class="q-form">接完之後變成什麼詞性？</div>' +
       '<div class="q-verb" style="font-size:1.5rem">' + formLabel + '</div>' +
       '<div class="q-mean">例：' + verb.dict + ' → ' + conjugate(verb, form) + '</div>';
+  } else if (qtype === "jita") {
+    html += '<div class="q-form">自動詞（が）還是他動詞（を）？</div>' +
+      '<div class="q-verb">' + verb.dict + '</div>' +
+      '<div class="q-reading">' + verb.reading + '</div>' +
+      '<div class="q-mean">' + (verb.pairMeaning || "") + '</div>';
+  } else if (qtype === "pairFind") {
+    const isIntr = verb.kind === "intr";
+    html += '<div class="q-form">配對的' + (isIntr ? '<b>他動詞</b>（を）' : '<b>自動詞</b>（が）') + '是什麼？</div>' +
+      '<div class="q-verb">' + verb.dict + '</div>' +
+      '<div class="q-reading">' + verb.reading + '　<span class="jt-tag ' + (isIntr?'jt-i':'jt-t') + '">' + (isIntr?'自動詞':'他動詞') + '</span></div>' +
+      '<div class="q-mean">' + (verb.pairMeaning || "") + '</div>';
   }
   html += '<div class="hint">點卡片看答案</div>';
   cardEl.innerHTML = html;
@@ -1029,6 +1131,27 @@ function showAnswer() {
     head = formLabel;
     main = rt ? rt.label : "";
     note = (rt ? rt.desc : "") + "　例：" + verb.dict + " → " + ans;
+  } else if (qtype === "jita") {
+    const isIntr = verb.kind === "intr";
+    head = verb.dict + "（" + verb.reading + "）";
+    main = isIntr ? "自動詞（〜が）" : "他動詞（〜を）";
+    const other = verb.pairWith;
+    note = (isIntr
+      ? "東西自己怎麼了，不提是誰做的。例：" + verb.dict.replace(/.$/, "") + "…が" + conjugate(verb,"ta")
+      : "有人刻意去做。例：（人が）…を" + conjugate(verb,"ta")) +
+      "　／　配對：" + other + "（" + (isIntr ? "他動詞" : "自動詞") + "）" +
+      "　／　模式：" + (PAIR_GROUPS[verb.pairGroup] || "") + (verb.pairNote ? "【" + verb.pairNote + "】" : "");
+  } else if (qtype === "pairFind") {
+    const isIntr = verb.kind === "intr";
+    head = verb.dict + "（" + (isIntr ? "自動詞" : "他動詞") + "）的配對";
+    main = verb.pairWith;
+    const pr = VERB_PAIRS.find(p => p.intr.dict === verb.dict || p.tran.dict === verb.dict);
+    if (pr) {
+      const o = isIntr ? pr.tran : pr.intr;
+      sub = o.reading;
+      note = "「" + verb.pairMeaning + "」　" + pr.intr.dict + "（自・が）⇄ " + pr.tran.dict + "（他・を）" +
+        "　／　模式：" + (PAIR_GROUPS[pr.group] || "") + (pr.note ? "【" + pr.note + "】" : "");
+    }
   }
 
   cardEl.innerHTML =
@@ -1089,6 +1212,7 @@ function recordMistake(q) {
     list.push({
       key, qtype, qtypeLabel: qt ? qt.label : "",
       dict: q.verb.dict, reading: q.verb.reading, type: q.verb.type,
+      kind: q.verb.kind || "", pairWith: q.verb.pairWith || "",
       form: q.form, formLabel: fObj ? fObj.label : "",
       answer: conjugate(q.verb, q.form), answerReading: conjugateReading(q.verb, q.form),
       count: 1, lastMiss: Date.now()
@@ -1129,6 +1253,12 @@ function renderMistakePanel() {
     } else if (m.qtype === "identify") {
       line = m.dict + " → " + m.answer + '<span class="arrow">＝</span><span class="mistake-ans">' + m.formLabel + '</span>';
       sub = "辨識形態";
+    } else if (m.qtype === "jita") {
+      line = m.dict + '<span class="arrow">→</span><span class="mistake-ans">' + (m.kind === "intr" ? "自動詞" : "他動詞") + '</span>';
+      sub = "自他判斷";
+    } else if (m.qtype === "pairFind") {
+      line = m.dict + '<span class="arrow">⇄</span><span class="mistake-ans">' + (m.pairWith||"") + '</span>';
+      sub = "自他配對";
     } else if (m.qtype === "resultType") {
       const fo = FORMS.find(f => f.key === m.form);
       const rt = fo && RESULT_TYPES[fo.result];
@@ -1199,6 +1329,7 @@ document.querySelectorAll(".pbtn").forEach(b => {
 
 document.getElementById("srcBuiltin").onchange = () => {};
 document.getElementById("srcMine").onchange = () => {};
+document.getElementById("srcPairs").onchange = () => {};
 
 // ===== 速記表 =====
 function buildRefTable() {
@@ -1222,6 +1353,29 @@ function buildRefTable() {
     html += "</tr>";
   });
   document.getElementById("refTable").innerHTML = html;
+}
+
+// ===== 自他動詞配對總表 =====
+function buildPairTables() {
+  const box = document.getElementById("pairTables");
+  if (!box) return;
+  const order = ["aru-eru","u-eru","reru-su","eru-u","u-asu","irr"];
+  const nums = ["①","②","③","④","⑤","⑥"];
+  box.innerHTML = order.map((g, i) => {
+    const rows = VERB_PAIRS.filter(p => p.group === g);
+    if (!rows.length) return "";
+    const body = rows.map(p =>
+      '<tr>' +
+        '<td class="j-i">' + p.intr.dict + '<div class="th-s">' + p.intr.reading + '</div></td>' +
+        '<td class="j-t">' + p.tran.dict + '<div class="th-s">' + p.tran.reading + '</div></td>' +
+        '<td>' + p.meaning + (p.note ? '<div class="th-s">【' + p.note + '】</div>' : '') + '</td>' +
+      '</tr>').join("");
+    return '<details class="sec pair-grp"><summary>' + nums[i] + ' ' + (PAIR_GROUPS[g]||g) +
+      ' <span class="cnt">' + rows.length + '</span></summary>' +
+      '<div class="tbl-wrap"><table class="onbin jt">' +
+        '<tr><th class="j-i">自動詞（が）</th><th class="j-t">他動詞（を）</th><th>意思</th></tr>' +
+        body + '</table></div></details>';
+  }).join("");
 }
 
 // ===== 分頁切換 =====
@@ -1267,7 +1421,9 @@ applyWork(localStorage.getItem("workMode")==="1");
 // ===== 啟動 =====
 (async function init(){
   await loadMine();
+  pairPool = pairVerbs();
   buildRefTable();
+  buildPairTables();
   pickQuestion();
   updateScore();
 })();

@@ -259,3 +259,88 @@ function normalizeVerb(dict, reading, pos, meaning) {
   if (!conjugate(v, "te") || !conjugate(v, "nai")) return null;
   return v;
 }
+
+// ===== 自他動詞配對（N4常見） =====
+// 每組：intr = 自動詞（配が）、tran = 他動詞（配を）、group = 變化模式、meaning = 中文
+const VERB_PAIRS = [
+  // ① 〜aru（自）⇄ 〜eru（他）
+  { group:"aru-eru", meaning:"關（門/窗）",  intr:{dict:"閉まる",reading:"しまる",type:"godan"},   tran:{dict:"閉める",reading:"しめる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"開始",        intr:{dict:"始まる",reading:"はじまる",type:"godan"}, tran:{dict:"始める",reading:"はじめる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"聚集／收集",   intr:{dict:"集まる",reading:"あつまる",type:"godan"}, tran:{dict:"集める",reading:"あつめる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"決定",        intr:{dict:"決まる",reading:"きまる",type:"godan"},   tran:{dict:"決める",reading:"きめる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"改變",        intr:{dict:"変わる",reading:"かわる",type:"godan"},   tran:{dict:"変える",reading:"かえる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"上升／舉起",   intr:{dict:"上がる",reading:"あがる",type:"godan"},   tran:{dict:"上げる",reading:"あげる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"下降／放下",   intr:{dict:"下がる",reading:"さがる",type:"godan"},   tran:{dict:"下げる",reading:"さげる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"停止",        intr:{dict:"止まる",reading:"とまる",type:"godan"},   tran:{dict:"止める",reading:"とめる",type:"ichidan"} },
+  { group:"aru-eru", meaning:"掛／花費",     intr:{dict:"掛かる",reading:"かかる",type:"godan"},   tran:{dict:"掛ける",reading:"かける",type:"ichidan"} },
+  { group:"aru-eru", meaning:"找到",        intr:{dict:"見つかる",reading:"みつかる",type:"godan"},tran:{dict:"見つける",reading:"みつける",type:"ichidan"} },
+  { group:"aru-eru", meaning:"得救／救",     intr:{dict:"助かる",reading:"たすかる",type:"godan"}, tran:{dict:"助ける",reading:"たすける",type:"ichidan"} },
+  // ② 〜u（自）⇄ 〜eru（他）
+  { group:"u-eru",   meaning:"開（門/窗）",  intr:{dict:"開く",reading:"あく",type:"godan"},       tran:{dict:"開ける",reading:"あける",type:"ichidan"} },
+  { group:"u-eru",   meaning:"繼續",        intr:{dict:"続く",reading:"つづく",type:"godan"},     tran:{dict:"続ける",reading:"つづける",type:"ichidan"} },
+  { group:"u-eru",   meaning:"附著／開電器", intr:{dict:"付く",reading:"つく",type:"godan"},       tran:{dict:"付ける",reading:"つける",type:"ichidan"} },
+  { group:"u-eru",   meaning:"整理",        intr:{dict:"片付く",reading:"かたづく",type:"godan"}, tran:{dict:"片付ける",reading:"かたづける",type:"ichidan"} },
+  { group:"u-eru",   meaning:"成長／養育",   intr:{dict:"育つ",reading:"そだつ",type:"godan"},     tran:{dict:"育てる",reading:"そだてる",type:"ichidan"} },
+  { group:"u-eru",   meaning:"排列",        intr:{dict:"並ぶ",reading:"ならぶ",type:"godan"},     tran:{dict:"並べる",reading:"ならべる",type:"ichidan"} },
+  { group:"u-eru",   meaning:"前進／推進",   intr:{dict:"進む",reading:"すすむ",type:"godan"},     tran:{dict:"進める",reading:"すすめる",type:"ichidan"} },
+  { group:"u-eru",   meaning:"送達／遞送",   intr:{dict:"届く",reading:"とどく",type:"godan"},     tran:{dict:"届ける",reading:"とどける",type:"ichidan"} },
+  { group:"u-eru",   meaning:"站立／豎立",   intr:{dict:"立つ",reading:"たつ",type:"godan"},       tran:{dict:"立てる",reading:"たてる",type:"ichidan"} },
+  // ③ 〜reru（自）⇄ 〜su（他）
+  { group:"reru-su", meaning:"壞掉／弄壞",   intr:{dict:"壊れる",reading:"こわれる",type:"ichidan"},tran:{dict:"壊す",reading:"こわす",type:"godan"} },
+  { group:"reru-su", meaning:"倒下／弄倒",   intr:{dict:"倒れる",reading:"たおれる",type:"ichidan"},tran:{dict:"倒す",reading:"たおす",type:"godan"} },
+  { group:"reru-su", meaning:"髒了／弄髒",   intr:{dict:"汚れる",reading:"よごれる",type:"ichidan"},tran:{dict:"汚す",reading:"よごす",type:"godan"} },
+  { group:"reru-su", meaning:"脫落／取下",   intr:{dict:"外れる",reading:"はずれる",type:"ichidan"},tran:{dict:"外す",reading:"はずす",type:"godan"} },
+  { group:"reru-su", meaning:"分離／放開",   intr:{dict:"離れる",reading:"はなれる",type:"ichidan"},tran:{dict:"離す",reading:"はなす",type:"godan"} },
+  { group:"reru-su", meaning:"躲藏／藏起",   intr:{dict:"隠れる",reading:"かくれる",type:"ichidan"},tran:{dict:"隠す",reading:"かくす",type:"godan"} },
+  // ④ 〜eru（自）⇄ 〜u（他）※自動詞比較長
+  { group:"eru-u",   meaning:"斷了／切",     intr:{dict:"切れる",reading:"きれる",type:"ichidan"}, tran:{dict:"切る",reading:"きる",type:"godan"} },
+  { group:"eru-u",   meaning:"破了／打破",   intr:{dict:"割れる",reading:"われる",type:"ichidan"}, tran:{dict:"割る",reading:"わる",type:"godan"} },
+  { group:"eru-u",   meaning:"折斷",        intr:{dict:"折れる",reading:"おれる",type:"ichidan"}, tran:{dict:"折る",reading:"おる",type:"godan"} },
+  { group:"eru-u",   meaning:"破了／撕破",   intr:{dict:"破れる",reading:"やぶれる",type:"ichidan"},tran:{dict:"破る",reading:"やぶる",type:"godan"} },
+  { group:"eru-u",   meaning:"賣得出去／賣", intr:{dict:"売れる",reading:"うれる",type:"ichidan"}, tran:{dict:"売る",reading:"うる",type:"godan"} },
+  { group:"eru-u",   meaning:"掉了／拿下",   intr:{dict:"取れる",reading:"とれる",type:"ichidan"}, tran:{dict:"取る",reading:"とる",type:"godan"} },
+  // ⑤ 〜u（自）⇄ 〜asu（他）
+  { group:"u-asu",   meaning:"動／移動",     intr:{dict:"動く",reading:"うごく",type:"godan"},     tran:{dict:"動かす",reading:"うごかす",type:"godan"} },
+  { group:"u-asu",   meaning:"沸騰／燒開",   intr:{dict:"沸く",reading:"わく",type:"godan"},       tran:{dict:"沸かす",reading:"わかす",type:"godan"} },
+  { group:"u-asu",   meaning:"乾／弄乾",     intr:{dict:"乾く",reading:"かわく",type:"godan"},     tran:{dict:"乾かす",reading:"かわかす",type:"godan"} },
+  { group:"u-asu",   meaning:"飛／放飛",     intr:{dict:"飛ぶ",reading:"とぶ",type:"godan"},       tran:{dict:"飛ばす",reading:"とばす",type:"godan"} },
+  { group:"u-asu",   meaning:"減少",        intr:{dict:"減る",reading:"へる",type:"godan"},       tran:{dict:"減らす",reading:"へらす",type:"godan"} },
+  { group:"u-asu",   meaning:"增加",        intr:{dict:"増える",reading:"ふえる",type:"ichidan"}, tran:{dict:"増やす",reading:"ふやす",type:"godan"} },
+  { group:"u-asu",   meaning:"變冷／冰鎮",   intr:{dict:"冷える",reading:"ひえる",type:"ichidan"}, tran:{dict:"冷やす",reading:"ひやす",type:"godan"} },
+  // ⑥ 不規則（讀音也變）
+  { group:"irr", meaning:"熄滅／關掉", note:"き⇄け", intr:{dict:"消える",reading:"きえる",type:"ichidan"}, tran:{dict:"消す",reading:"けす",type:"godan"} },
+  { group:"irr", meaning:"進入／放入", note:"はい⇄い", intr:{dict:"入る",reading:"はいる",type:"godan"},  tran:{dict:"入れる",reading:"いれる",type:"ichidan"} },
+  { group:"irr", meaning:"出去／拿出", note:"で⇄だ",  intr:{dict:"出る",reading:"でる",type:"ichidan"},   tran:{dict:"出す",reading:"だす",type:"godan"} },
+  { group:"irr", meaning:"起床／叫醒", intr:{dict:"起きる",reading:"おきる",type:"ichidan"}, tran:{dict:"起こす",reading:"おこす",type:"godan"} },
+  { group:"irr", meaning:"掉落／弄掉", intr:{dict:"落ちる",reading:"おちる",type:"ichidan"}, tran:{dict:"落とす",reading:"おとす",type:"godan"} },
+  { group:"irr", meaning:"修好／修理", intr:{dict:"直る",reading:"なおる",type:"godan"},     tran:{dict:"直す",reading:"なおす",type:"godan"} },
+  { group:"irr", meaning:"搭乘／載",   intr:{dict:"乗る",reading:"のる",type:"godan"},       tran:{dict:"乗せる",reading:"のせる",type:"ichidan"} },
+  { group:"irr", meaning:"剩下／留下", intr:{dict:"残る",reading:"のこる",type:"godan"},     tran:{dict:"残す",reading:"のこす",type:"godan"} },
+  { group:"irr", meaning:"返回／歸還", intr:{dict:"戻る",reading:"もどる",type:"godan"},     tran:{dict:"戻す",reading:"もどす",type:"godan"} }
+];
+
+const PAIR_GROUPS = {
+  "aru-eru": "〜aru（自）⇄ 〜eru（他）",
+  "u-eru":   "〜u（自）⇄ 〜eru（他）",
+  "reru-su": "〜reru（自）⇄ 〜su（他）",
+  "eru-u":   "〜eru（自）⇄ 〜u（他）",
+  "u-asu":   "〜u（自）⇄ 〜asu（他）",
+  "irr":     "不規則（讀音也變）"
+};
+
+// 把配對展開成可用於測驗/變化的動詞清單（帶 kind: "intr"|"tran"）
+function pairVerbs() {
+  const out = [];
+  VERB_PAIRS.forEach(p => {
+    ["intr","tran"].forEach(k => {
+      out.push({
+        dict: p[k].dict, reading: p[k].reading, type: p[k].type,
+        meaning: p.meaning + "（" + (k === "intr" ? "自動詞・が" : "他動詞・を") + "）",
+        kind: k, pairWith: p[k === "intr" ? "tran" : "intr"].dict,
+        pairMeaning: p.meaning, pairGroup: p.group, pairNote: p.note || "",
+        fromPair: true
+      });
+    });
+  });
+  return out;
+}
