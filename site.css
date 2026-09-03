@@ -3,6 +3,7 @@
 
 :root{
   --shell-max: 760px;
+  --topbar-h: 41px;
   --shell-pad: 16px;
   --radius: 12px;
   /* 全站統一主色（原本問題筆記是藍色，造成三頁看起來像三個網站） */
@@ -51,7 +52,7 @@ main, .controls, .wrap, .tabs, .panel{ padding-left:var(--shell-pad); padding-ri
 
 /* ── 搜尋列：黏在置頂列底下 ── */
 .controls{
-  position:sticky; top:41px; z-index:50;
+  position:sticky; top:var(--topbar-h); z-index:50;
   max-width:var(--shell-max); margin:0 auto !important;
   background:var(--bg);
   padding:10px var(--shell-pad) 8px !important;
@@ -62,7 +63,7 @@ body.work .controls{ background:#fff; backdrop-filter:none; border-bottom:1px so
 
 /* ── 動詞道場的分頁列：跟著捲動，長頁也能隨時換分頁 ── */
 .tabs{
-  position:sticky; top:41px; margin-top:0 !important; z-index:50;
+  position:sticky; top:var(--topbar-h); margin-top:0 !important; z-index:50;
   background:color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter:blur(6px);
   margin:12px calc(-1 * var(--shell-pad)) 10px !important;
@@ -94,7 +95,7 @@ body.work .controls{ background:#fff; backdrop-filter:none; border-bottom:1px so
 .toc-links a:hover{ background:var(--accent); color:#fff; }
 
 /* 捲動定位時不要被置頂列蓋住 */
-.sec-h, details.sec, [id^="sec-"]{ scroll-margin-top:96px; }
+.sec-h, details.sec, [id^="sec-"]{ scroll-margin-top:calc(var(--topbar-h) + 60px); }
 
 /* ── 降低盒中盒的層次感：外層卡片不再加底色，只留一條線 ── */
 .card{ border-radius:var(--radius) !important; }
@@ -120,8 +121,6 @@ main .card{ margin-top:12px !important; }
   .topnav a{ padding:4px 8px; font-size:0.76rem; }
   header{ padding-top:14px !important; }
   header h1{ font-size:1.05rem !important; }
-  .tabs{ top:37px; }
-  .controls{ top:37px; }
   /* 手機不要讓分頁列擠成兩排吃掉螢幕，改成單排橫向捲動 */
   .tabs{ flex-wrap:nowrap !important; overflow-x:auto; scrollbar-width:none; }
   .tabs::-webkit-scrollbar{ display:none; }

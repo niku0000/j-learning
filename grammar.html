@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文法清單</title>
+<style>
+  :root {
+    --bg:#f5f3ef; --card:#fff; --text:#2b2b2b; --muted:#7a7671;
+    --accent:#c9553d; --accent-soft:#f9e8e3; --border:#e5e0d8;
+    --good:#3f7d5a; --good-soft:#e4f0e9; --warn:#b8863b; --warn-soft:#faf0dd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#1b1a18; --card:#262421; --text:#e8e4dd; --muted:#9a938a;
+      --accent:#e8735c; --accent-soft:#3a2a26; --border:#38352f;
+      --good:#6fb08a; --good-soft:#22302a; --warn:#d8a860; --warn-soft:#332b1d;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#1b1a18; --card:#262421; --text:#e8e4dd; --muted:#9a938a;
+    --accent:#e8735c; --accent-soft:#3a2a26; --border:#38352f;
+    --good:#6fb08a; --good-soft:#22302a; --warn:#d8a860; --warn-soft:#332b1d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text); line-height:1.75;
+    font-family:-apple-system,"Hiragino Sans","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    font-size:15px;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:0 16px;}
+
+  /* 進度總覽 */
+  .dash{margin:14px 0 6px;}
+  .dash h2{font-size:0.95rem; margin:0 0 8px;}
+  .bar{height:10px; border-radius:999px; background:var(--border); overflow:hidden; display:flex;}
+  .bar i{display:block; height:100%;}
+  .bar i.ok{background:var(--good);}
+  .bar i.mid{background:var(--warn);}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:0.76rem; color:var(--muted); margin-top:6px;}
+  .legend b{font-weight:700; color:var(--text);}
+  .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:4px; vertical-align:middle;}
+  .dot.ok{background:var(--good);} .dot.mid{background:var(--warn);} .dot.no{background:var(--border);}
+
+  .gridsum{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px; margin-top:12px;}
+  .gs{border:1px solid var(--border); border-radius:10px; padding:8px 10px; background:var(--card); cursor:pointer;}
+  .gs .t{font-size:0.82rem; font-weight:700;}
+  .gs .n{font-size:0.72rem; color:var(--muted);}
+  .gs .bar{height:5px; margin-top:6px;}
+
+  /* 篩選 */
+  .filters{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:14px 0 4px;}
+  .fchip{font-size:0.78rem; padding:4px 12px; border-radius:999px; border:1px solid var(--border);
+         background:transparent; color:var(--muted); cursor:pointer;}
+  .fchip.on{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600;}
+  #gsearch{flex:1; min-width:160px; padding:7px 12px; border:1px solid var(--border); border-radius:8px;
+           background:var(--card); color:var(--text); font-size:0.85rem;}
+  #gsearch:focus{outline:none; border-color:var(--accent);}
+
+  /* 群組 */
+  .grp{margin-top:20px; border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;}
+  .grp > summary{list-style:none; cursor:pointer; padding:14px 16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .grp > summary::-webkit-details-marker{display:none;}
+  .grp > summary::before{content:"▶"; font-size:0.7rem; color:var(--muted); transition:transform .15s;}
+  .grp[open] > summary::before{transform:rotate(90deg);}
+  .grp .gt{font-size:1rem; font-weight:700;}
+  .grp .gsub{font-size:0.78rem; color:var(--muted);}
+  .grp .gcount{margin-left:auto; font-size:0.72rem; color:var(--muted); white-space:nowrap;}
+  .grp .body{padding:0 16px 16px;}
+
+  .why{font-size:0.85rem; background:var(--accent-soft); border-radius:10px; padding:10px 13px; margin-bottom:12px;}
+
+  table.cmp{width:100%; border-collapse:collapse; font-size:0.83rem; margin:10px 0 16px;}
+  table.cmp th,table.cmp td{border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top;}
+  table.cmp th{background:var(--accent-soft); font-weight:700; white-space:nowrap;}
+  table.cmp .zh{color:var(--muted); font-size:0.94em;}
+  .tblwrap{overflow-x:auto;}
+
+  /* 單條文法 */
+  .item{border-top:1px solid var(--border); padding:14px 0;}
+  .item:first-of-type{border-top:none;}
+  .ihead{display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+  .ijp{font-size:1.05rem; font-weight:700;}
+  .izh{font-size:0.85rem; color:var(--muted); width:100%;}
+  .state{margin-left:auto; display:flex; gap:4px;}
+  .sbtn{font-size:0.7rem; padding:3px 9px; border-radius:999px; border:1px solid var(--border);
+        background:transparent; color:var(--muted); cursor:pointer; white-space:nowrap;}
+  .sbtn.on[data-s="2"]{background:var(--good); border-color:var(--good); color:#fff;}
+  .sbtn.on[data-s="1"]{background:var(--warn); border-color:var(--warn); color:#fff;}
+  .sbtn.on[data-s="0"]{background:var(--border); color:var(--text);}
+  .form{font-size:0.8rem; margin-top:6px; padding:6px 10px; border-left:3px solid var(--accent);
+        background:var(--accent-soft); border-radius:0 6px 6px 0;}
+  .form::before{content:"接續　"; color:var(--accent); font-weight:700;}
+  ul.ex{list-style:none; padding:0; margin:8px 0 0;}
+  ul.ex li{padding:5px 0 5px 12px; border-left:2px solid var(--border); margin:4px 0;}
+  ul.ex .j{font-size:0.97rem;}
+  ul.ex .z{font-size:0.8rem; color:var(--muted);}
+  .tip,.warnbox{font-size:0.82rem; margin-top:9px; padding:8px 11px; border-radius:8px;}
+  .tip{background:var(--good-soft); border-left:3px solid var(--good);}
+  .tip::before{content:"💡 "; }
+  .warnbox{background:var(--warn-soft); border-left:3px solid var(--warn);}
+  .warnbox::before{content:"⚠ "; font-weight:700;}
+  .seen{display:inline-block; font-size:0.7rem; padding:2px 8px; border-radius:999px;
+        background:var(--good-soft); color:var(--good); font-weight:600; text-decoration:none;}
+
+  .hidden{display:none !important;}
+  footer{max-width:760px; margin:36px auto 40px; padding:0 16px; font-size:0.76rem; color:var(--muted); text-align:center;}
+
+  .theme-toggle,.work-toggle{position:fixed; right:16px; border:1px solid var(--border);
+    background:var(--card); color:var(--muted); border-radius:999px; cursor:pointer; z-index:70;}
+  .theme-toggle{bottom:56px; width:38px; height:38px; font-size:1rem;}
+  .work-toggle{bottom:12px; padding:7px 14px; font-size:0.76rem;}
+
+  /* 摸魚模式 */
+  body.work{background:#fff; color:#202020; font-family:"Segoe UI",Arial,"Microsoft JhengHei",sans-serif; font-size:13px; line-height:1.5;}
+  body.work .grp{border:1px solid #ddd; border-radius:0; background:#fff;}
+  body.work .why,body.work .tip,body.work .warnbox,body.work .form{background:#f5f5f5; border-left:2px solid #ccc; border-radius:0;}
+  body.work .tip::before,body.work .warnbox::before{content:"";}
+  body.work table.cmp th{background:#eee;}
+  body.work .ijp{font-size:0.95rem;}
+  body.work .sbtn.on[data-s="2"]{background:#555; border-color:#555;}
+  body.work .sbtn.on[data-s="1"]{background:#999; border-color:#999;}
+  body.work .bar i.ok{background:#555;} body.work .bar i.mid{background:#aaa;}
+  body.work .fchip.on{background:#555; border-color:#555;}
+  body.work .seen{background:#eee; color:#333;}
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="dash">
+    <h2>N4 重點文法覆蓋率</h2>
+    <div class="bar" id="allBar"></div>
+    <div class="legend">
+      <span><span class="dot ok"></span>熟練 <b id="cOk">0</b></span>
+      <span><span class="dot mid"></span>學習中 <b id="cMid">0</b></span>
+      <span><span class="dot no"></span>未學 <b id="cNo">0</b></span>
+      <span>共 <b id="cAll">0</b> 項</span>
+    </div>
+    <div class="gridsum" id="gridsum"></div>
+  </div>
+
+  <div class="filters">
+    <button class="fchip on" data-f="all">全部</button>
+    <button class="fchip" data-f="0">未學</button>
+    <button class="fchip" data-f="1">學習中</button>
+    <button class="fchip" data-f="2">熟練</button>
+    <input id="gsearch" type="search" placeholder="🔍 搜尋文法 / 中文 / 例句…">
+  </div>
+
+  <div id="groups"></div>
+</div>
+
+<footer>
+  資料來源：grammar.json ・ 學習狀態存在這台裝置的瀏覽器裡<br>
+  動詞怎麼<b>變化</b>（ます形・て形・可能形…）在「動詞道場」，這裡只放<b>句型用法</b>
+</footer>
+
+<button class="theme-toggle" id="themeToggle" title="切換深色/淺色模式">🌙</button>
+<button class="work-toggle" id="workToggle" title="切換摸魚模式（Esc）">摸魚模式</button>
+
+<script>
+const LS_STATE = "n4grammar.state";
+const LABELS = ["未學", "學習中", "熟練"];
+let DATA = null, SEEN = {}, state = {}, filter = "all", kw = "";
+
+try { state = JSON.parse(localStorage.getItem(LS_STATE) || "{}"); } catch (e) { state = {}; }
+function saveState() { try { localStorage.setItem(LS_STATE, JSON.stringify(state)); } catch (e) {} }
+function st(id) { return state[id] === undefined ? 0 : state[id]; }
+
+const esc = s => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// 資料裡刻意允許 <b> / <br> / <span class='zh'> 當作排版標記，這裡只還原這幾個
+const rich = s => esc(s)
+  .replace(/&lt;(\/?)b&gt;/g, "<$1b>")
+  .replace(/&lt;br&gt;/g, "<br>")
+  .replace(/&lt;span class='zh'&gt;/g, "<span class='zh'>")
+  .replace(/&lt;\/span&gt;/g, "</span>");
+
+/* 這條文法在「學習記錄」裡出現過嗎 */
+function buildSeen(entries) {
+  const idx = {};
+  entries.forEach(e => {
+    const hay = JSON.stringify(e.grammar || []) + JSON.stringify(e.tags || []);
+    idx[e.id || e.jp || Math.random()] = hay;
+  });
+  return idx;
+}
+function seenKey(item) {
+  return item.jp.split("／")[0].replace(/[〜～]/g, "").replace(/[（(].*$/, "").trim();
+}
+function seenCount(item) {
+  // 用文法本體當關鍵字比對學習記錄裡的文法點。
+  // 只在關鍵字位於「〜」等標記之後或字串開頭時才算命中，
+  // 否則像「がる」會誤中「曲がる」這種單純含有相同假名的詞。
+  const key = seenKey(item);
+  if (key.length < 2) return 0;
+  const q = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp('(^|["\u3001\u3002\u300c\u300e\uff5e\u301c\u30fb])' + q);
+  return Object.values(SEEN).filter(h => re.test(h)).length;
+}
+
+function itemHTML(it) {
+  const s = st(it.id);
+  const n = seenCount(it);
+  return '<div class="item" data-id="' + esc(it.id) + '" data-state="' + s + '" data-text="' +
+      esc(it.jp + " " + it.zh + " " + (it.ex || []).map(e => e.jp + e.zh).join(" ")) + '">' +
+    '<div class="ihead">' +
+      '<span class="ijp">' + rich(it.jp) + '</span>' +
+      (n ? '<a class="seen" href="index.html?q=' + encodeURIComponent(seenKey(it)) +
+           '" title="到學習記錄看這 ' + n + ' 則">📗 記錄 ' + n + '</a>' : '') +
+      '<span class="state">' +
+        [0, 1, 2].map(v => '<button class="sbtn' + (s === v ? ' on' : '') +
+          '" data-s="' + v + '">' + LABELS[v] + '</button>').join("") +
+      '</span>' +
+      '<span class="izh">' + rich(it.zh) + '</span>' +
+    '</div>' +
+    (it.form ? '<div class="form">' + rich(it.form) + '</div>' : '') +
+    ((it.ex || []).length ? '<ul class="ex">' + it.ex.map(e =>
+      '<li><div class="j">' + rich(e.jp) + '</div>' +
+      (e.zh ? '<div class="z">' + rich(e.zh) + '</div>' : '') + '</li>').join("") + '</ul>' : '') +
+    (it.tip ? '<div class="tip">' + rich(it.tip) + '</div>' : '') +
+    (it.warn ? '<div class="warnbox">' + rich(it.warn) + '</div>' : '') +
+  '</div>';
+}
+
+function tableHTML(t) {
+  if (!t) return "";
+  return '<div class="tblwrap"><table class="cmp"><tr>' +
+    t.head.map(h => '<th>' + rich(h) + '</th>').join("") + '</tr>' +
+    t.rows.map(r => '<tr>' + r.map(c => '<td>' + rich(c) + '</td>').join("") + '</tr>').join("") +
+    '</table></div>';
+}
+
+function groupHTML(g) {
+  return '<details class="grp" id="g-' + esc(g.key) + '" open>' +
+    '<summary><span class="gt">' + esc(g.title) + '</span>' +
+      '<span class="gsub">' + esc(g.sub || "") + '</span>' +
+      '<span class="gcount" data-count="' + esc(g.key) + '"></span></summary>' +
+    '<div class="body">' +
+      (g.why ? '<div class="why">' + rich(g.why) + '</div>' : '') +
+      tableHTML(g.table) +
+      g.items.map(itemHTML).join("") +
+    '</div></details>';
+}
+
+function barHTML(items) {
+  const n = items.length || 1;
+  const ok = items.filter(i => st(i.id) === 2).length;
+  const mid = items.filter(i => st(i.id) === 1).length;
+  return '<i class="ok" style="width:' + (ok / n * 100) + '%"></i>' +
+         '<i class="mid" style="width:' + (mid / n * 100) + '%"></i>';
+}
+
+function refreshStats() {
+  const all = DATA.groups.flatMap(g => g.items);
+  const ok = all.filter(i => st(i.id) === 2).length;
+  const mid = all.filter(i => st(i.id) === 1).length;
+  document.getElementById("allBar").innerHTML = barHTML(all);
+  document.getElementById("cOk").textContent = ok;
+  document.getElementById("cMid").textContent = mid;
+  document.getElementById("cNo").textContent = all.length - ok - mid;
+  document.getElementById("cAll").textContent = all.length;
+
+  document.getElementById("gridsum").innerHTML = DATA.groups.map(g => {
+    const done = g.items.filter(i => st(i.id) === 2).length;
+    return '<div class="gs" data-go="' + g.key + '">' +
+      '<div class="t">' + esc(g.title) + '</div>' +
+      '<div class="n">' + done + " / " + g.items.length + ' 熟練</div>' +
+      '<div class="bar">' + barHTML(g.items) + '</div></div>';
+  }).join("");
+
+  DATA.groups.forEach(g => {
+    const el = document.querySelector('[data-count="' + g.key + '"]');
+    if (el) el.textContent = g.items.filter(i => st(i.id) === 2).length + " / " + g.items.length;
+  });
+}
+
+function applyFilter() {
+  document.querySelectorAll(".grp").forEach(grp => {
+    let shown = 0;
+    grp.querySelectorAll(".item").forEach(it => {
+      const okState = filter === "all" || String(st(it.dataset.id)) === filter;
+      const okKw = !kw || it.dataset.text.toLowerCase().indexOf(kw) >= 0;
+      const show = okState && okKw;
+      it.classList.toggle("hidden", !show);
+      if (show) shown++;
+    });
+    grp.classList.toggle("hidden", shown === 0);
+    if (shown && (kw || filter !== "all")) grp.open = true;
+  });
+}
+
+function render() {
+  document.getElementById("groups").innerHTML = DATA.groups.map(groupHTML).join("");
+  refreshStats();
+  applyFilter();
+}
+
+/* 事件 */
+document.getElementById("groups").addEventListener("click", e => {
+  const b = e.target.closest(".sbtn");
+  if (!b) return;
+  e.preventDefault();
+  const item = b.closest(".item");
+  const id = item.dataset.id;
+  const v = Number(b.dataset.s);
+  state[id] = v; saveState();
+  item.dataset.state = v;
+  item.querySelectorAll(".sbtn").forEach(x => x.classList.toggle("on", Number(x.dataset.s) === v));
+  refreshStats();
+  if (filter !== "all") applyFilter();
+});
+
+document.getElementById("gridsum").addEventListener("click", e => {
+  const c = e.target.closest("[data-go]");
+  if (!c) return;
+  const g = document.getElementById("g-" + c.dataset.go);
+  if (g) { g.open = true; g.scrollIntoView({ behavior: "smooth", block: "start" }); }
+});
+
+document.querySelectorAll(".fchip").forEach(c => c.addEventListener("click", () => {
+  document.querySelectorAll(".fchip").forEach(x => x.classList.remove("on"));
+  c.classList.add("on");
+  filter = c.dataset.f;
+  applyFilter();
+}));
+
+document.getElementById("gsearch").addEventListener("input", e => {
+  kw = e.target.value.trim().toLowerCase();
+  applyFilter();
+});
+
+/* 深色 / 摸魚 */
+(function () {
+  const t = localStorage.getItem("n4.theme");
+  if (t) document.documentElement.setAttribute("data-theme", t);
+  const tb = document.getElementById("themeToggle");
+  function sync() {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark" ||
+      (!document.documentElement.getAttribute("data-theme") &&
+        matchMedia("(prefers-color-scheme: dark)").matches);
+    tb.textContent = dark ? "☀️" : "🌙";
+  }
+  sync();
+  tb.addEventListener("click", () => {
+    const cur = document.documentElement.getAttribute("data-theme");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    localStorage.setItem("n4.theme", next);
+    sync();
+  });
+
+  const wb = document.getElementById("workToggle");
+  function setWork(on) {
+    document.body.classList.toggle("work", on);
+    wb.textContent = on ? "一般模式" : "摸魚模式";
+    localStorage.setItem("n4.work", on ? "1" : "0");
+  }
+  setWork(localStorage.getItem("n4.work") === "1");
+  wb.addEventListener("click", () => setWork(!document.body.classList.contains("work")));
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") setWork(!document.body.classList.contains("work"));
+  });
+})();
+
+/* 載入 */
+Promise.all([
+  fetch("grammar.json").then(r => r.json()),
+  fetch("data.json").then(r => r.json()).catch(() => ({ entries: [] }))
+]).then(([g, d]) => {
+  DATA = g;
+  SEEN = buildSeen(d.entries || []);
+  render();
+}).catch(err => {
+  document.getElementById("groups").innerHTML =
+    '<p style="text-align:center;color:var(--muted)">無法載入 grammar.json<br>' + esc(err) + '</p>';
+});
+</script>
+<script src="site.js"></script>
+</body>
+</html>

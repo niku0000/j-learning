@@ -3,6 +3,7 @@
   var PAGES = [
     { href: "index.html",     label: "學習記錄" },
     { href: "drill.html",     label: "動詞道場" },
+    { href: "grammar.html",   label: "文法清單" },
     { href: "questions.html", label: "問題筆記" }
   ];
 
@@ -27,6 +28,15 @@
         '</nav>' +
       '</div>';
     document.body.insertBefore(bar, document.body.firstChild);
+
+    // 置頂列高度會隨螢幕寬度換行而變，量出來給底下的黏著元素當偏移
+    var sync = function () {
+      document.documentElement.style.setProperty(
+        "--topbar-h", Math.round(bar.getBoundingClientRect().height) + "px");
+    };
+    sync();
+    window.addEventListener("resize", sync);
+    if (window.ResizeObserver) new ResizeObserver(sync).observe(bar);
   }
 
   /* 回到頂端 */

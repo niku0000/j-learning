@@ -355,6 +355,14 @@ document.getElementById("search").addEventListener("input", ev => {
   render();
 });
 
+// 支援從別頁帶關鍵字進來（例如文法清單的「記錄 N」徽章）：index.html?q=〜のに
+(function () {
+  const q = new URLSearchParams(location.search).get("q");
+  if (!q) return;
+  query = q.trim();
+  document.getElementById("search").value = query;
+})();
+
 // 標籤收合切換
 const tagToggle = document.getElementById("tagToggle");
 function collapseTags() {
