@@ -358,14 +358,17 @@ const page = (title, body) =>
 <title>${title}</title><style>${CSS}</style></head>
 <body>${body}</body></html>`;
 
-fs.writeFileSync(path.join(ROOT, "worksheet.html"),
+// HTML 只是產生 PDF 用的中間檔，不放進網站
+const BUILD = path.join(ROOT, "build");
+fs.mkdirSync(BUILD, { recursive: true });
+fs.writeFileSync(path.join(BUILD, "worksheet.html"),
   page("N4 動詞変化ドリル（問題）", buildQuestionPages()), "utf8");
-fs.writeFileSync(path.join(ROOT, "worksheet-answers.html"),
+fs.writeFileSync(path.join(BUILD, "worksheet-answers.html"),
   page("N4 動詞変化ドリル（解答・解説）", buildAnswerPages()), "utf8");
 
 // 統計
 let total = 0;
 PAGES.forEach(pg => pg.blocks.forEach(b => total += b.qs.length));
 const p5n = PAGE5.jita.length + PAGE5.adj.length + PAGE5.rewrite.length;
-console.log("worksheet.html / worksheet-answers.html 產生完成");
+console.log("build/worksheet.html / build/worksheet-answers.html 產生完成");
 console.log("題數：第1-4回 " + total + " 題 ＋ 第5回 " + p5n + " 題 ＝ 合計 " + (total + p5n) + " 題");
