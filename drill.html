@@ -36,10 +36,10 @@
   .nav a.here { color:var(--accent); font-weight:600; }
   .tabs { display:flex; flex-wrap:wrap; gap:6px; margin:16px 0 10px; }
   .tab {
-    flex:1 1 auto; min-width:calc(50% - 3px); text-align:center; padding:8px 6px; border-radius:10px; cursor:pointer;
-    background:var(--tag-bg); color:var(--muted); font-size:0.88rem; user-select:none;
+    flex:1 1 auto; min-width:92px; text-align:center; padding:8px 6px; border-radius:10px; cursor:pointer;
+    background:var(--tag-bg); color:var(--muted); font-size:0.86rem; user-select:none; white-space:nowrap;
   }
-  @media (min-width:560px) { .tab { min-width:0; } }
+  @media (min-width:600px) { .tab { min-width:0; } }
   .tab.active { background:var(--accent); color:#fff; }
   .panel { display:none; } .panel.active { display:block; }
 
@@ -301,6 +301,43 @@
   table.onbin.jt th.j-i, table.onbin.jt th.j-t { font-weight:700; }
   table.onbin.jt .th-s { font-size:0.68rem; font-weight:400; color:var(--muted); margin-top:1px; }
   body.work details.sec.pair-grp { background:#f6f6f6; }
+
+  /* ===== 形容詞分頁 ===== */
+  .adj-i, .adj-na { font-size:0.7rem; padding:2px 9px; border-radius:999px; font-weight:700; white-space:nowrap; }
+  .adj-i  { background:#e4ecf8; color:#33619e; }
+  .adj-na { background:#f5e8dc; color:#9a6033; }
+  table.onbin.adjtbl { width:100%; }
+  table.onbin.adjtbl td, table.onbin.adjtbl th { font-size:0.84rem; padding:7px 9px; white-space:normal; }
+  table.onbin.adjtbl td.form { white-space:nowrap; color:var(--muted); font-weight:600; font-size:0.78rem; }
+  table.onbin.adjtbl th.h-i  { background:#e4ecf8; color:#33619e; }
+  table.onbin.adjtbl th.h-na { background:#f5e8dc; color:#9a6033; }
+  table.onbin.adjtbl th .th-s { font-weight:400; font-size:0.7rem; opacity:0.8; margin-top:2px; }
+  table.onbin.adjtbl td .th-s { font-weight:400; font-size:0.72rem; color:var(--muted); margin-top:3px; }
+  table.onbin.adjtbl b { color:var(--accent); }
+  table.onbin.adjtbl tr.sep td { border-top:2px solid var(--border); }
+  table.onbin.pickt th.h-i  { background:#e4ecf8; color:#33619e; }
+  table.onbin.pickt th.h-na { background:#f5e8dc; color:#9a6033; }
+  .wrong { color:var(--bad); text-decoration:line-through; text-decoration-thickness:1px; }
+  td.wrong { text-decoration:none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .adj-i,
+    :root:not([data-theme="light"]) table.onbin.adjtbl th.h-i,
+    :root:not([data-theme="light"]) table.onbin.pickt th.h-i { background:#1e2a3a; color:#8fb6e8; }
+    :root:not([data-theme="light"]) .adj-na,
+    :root:not([data-theme="light"]) table.onbin.adjtbl th.h-na,
+    :root:not([data-theme="light"]) table.onbin.pickt th.h-na { background:#332619; color:#d3a273; }
+  }
+  :root[data-theme="dark"] .adj-i,
+  :root[data-theme="dark"] table.onbin.adjtbl th.h-i,
+  :root[data-theme="dark"] table.onbin.pickt th.h-i { background:#1e2a3a; color:#8fb6e8; }
+  :root[data-theme="dark"] .adj-na,
+  :root[data-theme="dark"] table.onbin.adjtbl th.h-na,
+  :root[data-theme="dark"] table.onbin.pickt th.h-na { background:#332619; color:#d3a273; }
+  body.work .adj-i, body.work .adj-na,
+  body.work table.onbin.adjtbl th.h-i, body.work table.onbin.adjtbl th.h-na,
+  body.work table.onbin.pickt th.h-i, body.work table.onbin.pickt th.h-na { background:#eee !important; color:#555 !important; }
+  body.work table.onbin.adjtbl b { color:#202020; }
+  body.work .wrong { color:#777; }
   body.work .dan-tag { background:#666 !important; }
   body.work ul.ex li b { color:#202020; }
   body.work .u-warn { background:#f6f6f6; color:#555; }
@@ -317,6 +354,7 @@
     <div class="tab active" data-panel="quiz">翻卡測驗</div>
     <div class="tab" data-panel="ref">變化速記表</div>
     <div class="tab" data-panel="usage">用法例句</div>
+    <div class="tab" data-panel="adj">形容詞</div>
     <div class="tab" data-panel="mistakes">錯題本 <span id="mistakeCount" class="cnt-badge"></span></div>
   </div>
 
@@ -911,6 +949,186 @@
             <li>友達<b>に</b>来られて、勉強できなかった。<span class="tr">朋友來了（害我）沒辦法唸書。</span></li>
           </ul>
         </div>
+      </div>
+    </details>
+  </div>
+
+  <!-- 形容詞 -->
+  <div class="panel" id="panel-adj">
+
+    <div class="ref-note intro">
+      <b>形容詞只有兩種：い形容詞 ・ な形容詞</b>
+      <div class="steps3">先判斷是哪一種 → 再套該類變化。跟動詞「先分類再變化」是同一套思路。</div>
+    </div>
+
+    <!-- 判斷 -->
+    <div class="ref-note">
+      <div class="sub-h">STEP ① 這是い形還是な形？</div>
+      <div class="pick">
+        <div class="pick-h"><b>最可靠的判斷法：試著接名詞</b>——要加「な」就是な形容詞</div>
+        <table class="onbin pickt">
+          <tr><th>試接名詞</th><th>結果</th><th>判定</th></tr>
+          <tr><td class="form">高い ＋ 山</td><td>高い山（不用加な）</td><td><span class="adj-i">い形容詞</span></td></tr>
+          <tr><td class="form">静か ＋ 町</td><td>静か<b>な</b>町（要加な）</td><td><span class="adj-na">な形容詞</span></td></tr>
+        </table>
+      </div>
+      <div class="mini"><b>💡 輔助線索</b>：<b>漢語（音讀）詞多半是な形容詞</b>——静か・有名・便利・親切・簡単・大切・元気・安全。</div>
+      <div class="uc-warn">
+        <b>⚠ 陷阱：這些「い」結尾的其實是な形容詞</b><br>
+        <b>きれい（綺麗）</b>漂亮/乾淨　・　<b>きらい（嫌い）</b>討厭　・　<b>有名（ゆうめい）</b>　・　<b>得意（とくい）</b>擅長　・　<b>幸い（さいわい）</b>
+        <div class="mini" style="margin-top:6px;">きれい<b>な</b>人（○）／きれい人（✗）　　嫌い<b>じゃない</b>（○）／嫌く<b>ない</b>（✗）</div>
+      </div>
+    </div>
+
+    <!-- 核心對照表 -->
+    <div class="sec-h">STEP ② 核心變化對照表（最常查的就是這張）</div>
+    <div class="tbl-wrap">
+      <table class="onbin adjtbl">
+        <tr>
+          <th>用法</th>
+          <th class="h-i">い形容詞<div class="th-s">高い（貴/高）</div></th>
+          <th class="h-na">な形容詞<div class="th-s">静か（安靜）</div></th>
+        </tr>
+        <tr><td class="form">現在・肯定</td><td>高<b>い</b></td><td>静か<b>だ</b></td></tr>
+        <tr><td class="form">現在・否定</td><td>高<b>くない</b></td><td>静か<b>じゃない</b></td></tr>
+        <tr><td class="form">過去・肯定</td><td>高<b>かった</b></td><td>静か<b>だった</b></td></tr>
+        <tr><td class="form">過去・否定</td><td>高<b>くなかった</b></td><td>静か<b>じゃなかった</b></td></tr>
+        <tr class="sep"><td class="form">て形（連接）</td><td>高<b>くて</b></td><td>静か<b>で</b></td></tr>
+        <tr><td class="form">副詞化（修飾動詞）</td><td>高<b>く</b></td><td>静か<b>に</b></td></tr>
+        <tr><td class="form">接名詞</td><td>高<b>い</b>山</td><td>静か<b>な</b>町</td></tr>
+        <tr><td class="form">變成～（なる）</td><td>高<b>く</b>なる</td><td>静か<b>に</b>なる</td></tr>
+      </table>
+    </div>
+    <div class="ref-note">
+      <div class="sub-h">★ 記憶重點：い形把「い」拆掉換東西，な形整個不動只換後面</div>
+      <div class="tbl-wrap">
+        <table class="onbin pickt">
+          <tr><th></th><th class="h-i">い形</th><th class="h-na">な形</th></tr>
+          <tr><td class="form">否定</td><td><b>く</b>ない</td><td><b>じゃ</b>ない</td></tr>
+          <tr><td class="form">て形</td><td><b>く</b>て</td><td><b>で</b></td></tr>
+          <tr><td class="form">副詞</td><td><b>く</b></td><td><b>に</b></td></tr>
+          <tr><td class="form">接名詞</td><td>直接接</td><td>加<b>な</b></td></tr>
+        </table>
+      </div>
+      <div class="mini"><b>一句話</b>：い形的變化幾乎都圍繞「<b>く</b>」；な形的變化幾乎都圍繞「<b>だ／で／に／な</b>」。</div>
+    </div>
+
+    <!-- 丁寧體 -->
+    <details class="sec grp">
+      <summary><span class="grp-tag g-u">丁寧體</span> です／ではありません 完整表 <span class="cnt">8</span></summary>
+      <div class="grp-body">
+        <div class="tbl-wrap">
+          <table class="onbin adjtbl">
+            <tr><th>用法</th><th class="h-i">い形容詞</th><th class="h-na">な形容詞</th></tr>
+            <tr><td class="form">現在・肯定</td><td>高い<b>です</b></td><td>静か<b>です</b></td></tr>
+            <tr><td class="form">現在・否定</td><td>高くない<b>です</b><div class="th-s">＝高く<b>ありません</b></div></td><td>静か<b>じゃないです</b><div class="th-s">＝静か<b>ではありません</b></div></td></tr>
+            <tr><td class="form">過去・肯定</td><td>高かった<b>です</b></td><td>静か<b>でした</b></td></tr>
+            <tr><td class="form">過去・否定</td><td>高くなかった<b>です</b><div class="th-s">＝高く<b>ありませんでした</b></div></td><td>静か<b>じゃなかったです</b><div class="th-s">＝静か<b>ではありませんでした</b></div></td></tr>
+          </table>
+        </div>
+        <div class="uc-warn">
+          ⚠ <b>い形容詞不能說「高いでした」！</b><br>
+          過去式要變在<b>形容詞本身</b>：高<b>かった</b>です（○）／高いでした（✗）。
+          <div class="mini" style="margin-top:6px;">な形容詞才是「静か<b>でした</b>」——因為な形的過去變在です上面。這是最常見的錯誤之一。</div>
+        </div>
+        <div class="uc-note">ではありません 比 じゃないです 更正式；口語日常用 じゃない 就好。</div>
+      </div>
+    </details>
+
+    <!-- 特殊變化 -->
+    <details class="sec grp danger">
+      <summary><span class="grp-tag g-x">特殊</span> いい・大きな・同じ <span class="cnt">3</span></summary>
+      <div class="grp-body">
+
+        <div class="uc">
+          <div class="uc-h">① いい／よい ── 變化時要換成「よ」</div>
+          <div class="uc-m">最重要的不規則形容詞。<b>いい 只能用在「現在肯定」，其他形態全部改用 よ</b>。</div>
+          <div class="tbl-wrap">
+            <table class="onbin pickt">
+              <tr><th>用法</th><th>○ 正確</th><th>✗ 錯誤</th></tr>
+              <tr><td class="form">現在肯定</td><td><b>いい</b>／よい</td><td>—</td></tr>
+              <tr><td class="form">否定</td><td><b>よ</b>くない</td><td class="wrong">いくない</td></tr>
+              <tr><td class="form">過去</td><td><b>よ</b>かった</td><td class="wrong">いかった</td></tr>
+              <tr><td class="form">過去否定</td><td><b>よ</b>くなかった</td><td class="wrong">いくなかった</td></tr>
+              <tr><td class="form">て形</td><td><b>よ</b>くて</td><td class="wrong">いくて</td></tr>
+              <tr><td class="form">副詞</td><td><b>よ</b>く</td><td class="wrong">いく</td></tr>
+            </table>
+          </div>
+          <div class="uc-note">複合詞同理：かっこ<b>いい</b>→かっこ<b>よ</b>かった／かっこ<b>よ</b>くない。「よかった！」＝太好了！是超高頻口語。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">② 大きな・小さな ── 只能接名詞</div>
+          <div class="uc-m">大きい・小さい 是正常い形容詞；但另有 <b>大きな・小さな</b> 這種形態，<b>只能直接接名詞，不能變化</b>。</div>
+          <ul class="ex">
+            <li>大き<b>い</b>家／大き<b>な</b>家<span class="tr">兩個都對（大きな 語感較文學/柔和）</span></li>
+            <li>この家は大き<b>い</b>。<span class="tr">○ 當述語只能用 大きい</span></li>
+            <li><span class="wrong">この家は大きな。</span><span class="tr">✗ 大きな 不能當述語</span></li>
+          </ul>
+          <div class="uc-note">同類還有 おかしな（奇怪的）、いろんな（各種的）——都只能接名詞。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">③ 同じ ── な形容詞但接名詞不加な</div>
+          <div class="uc-m">同じ（おなじ）是な形容詞，但<b>接名詞時例外不加な</b>。</div>
+          <ul class="ex">
+            <li>同じ<b>本</b><span class="tr">○ 不用加な（同じな本 ✗）</span></li>
+            <li>これと同じ<b>です</b>。<span class="tr">○ 當述語照な形變化</span></li>
+            <li>同じ<b>だった</b>。<span class="tr">○ 過去式照な形</span></li>
+          </ul>
+        </div>
+      </div>
+    </details>
+
+    <!-- 連接與程度 -->
+    <details class="sec grp">
+      <summary><span class="grp-tag g-i">實用</span> 連接兩個形容詞・程度副詞 <span class="cnt">2</span></summary>
+      <div class="grp-body">
+
+        <div class="uc">
+          <div class="uc-h">連接兩個形容詞（て形）</div>
+          <div class="uc-m">要把兩個形容詞串起來，用<b>て形</b>：い形→<b>くて</b>、な形→<b>で</b>。</div>
+          <ul class="ex">
+            <li>この店は<b>安くて</b>おいしい。<span class="tr">這家店又便宜又好吃。（い形：安い→安くて）</span></li>
+            <li>ここは<b>静かで</b>きれいです。<span class="tr">這裡又安靜又漂亮。（な形：静か→静かで）</span></li>
+            <li><b>きれいで</b>優しい人。<span class="tr">又漂亮又溫柔的人。（きれい是な形！）</span></li>
+          </ul>
+          <div class="uc-note">⚠ 前後語感要一致（都正面或都負面），若相反要用「〜が／〜けど」：安いが、まずい（便宜但難吃）。</div>
+        </div>
+
+        <div class="uc">
+          <div class="uc-h">程度副詞（直接放形容詞前面）</div>
+          <div class="tbl-wrap">
+            <table class="onbin pickt">
+              <tr><th>副詞</th><th>意思</th><th>例</th></tr>
+              <tr><td class="form">とても</td><td>非常</td><td>とても高い</td></tr>
+              <tr><td class="form">すごく</td><td>超（口語）</td><td>すごくきれい</td></tr>
+              <tr><td class="form">ちょっと</td><td>有點</td><td>ちょっと高い</td></tr>
+              <tr><td class="form">あまり〜ない</td><td>不太～</td><td>あまり高くない</td></tr>
+              <tr><td class="form">全然〜ない</td><td>完全不～</td><td>全然静かじゃない</td></tr>
+            </table>
+          </div>
+          <div class="uc-note">あまり・全然 <b>後面一定要接否定</b>，這是固定搭配。</div>
+        </div>
+      </div>
+    </details>
+
+    <!-- 與動詞的連結 -->
+    <details class="sec grp key">
+      <summary><span class="grp-tag key">★連結</span> 為什麼學動詞也要懂い形容詞？ <span class="cnt">1</span></summary>
+      <div class="grp-body">
+        <div class="u-use">
+          你在「用法例句」學過：某些動詞變化<b>接完之後會變成い形容詞</b>，之後就照這一頁的い形規則繼續變。
+        </div>
+        <div class="tbl-wrap">
+          <table class="onbin pickt">
+            <tr><th>動詞變化</th><th>結果</th><th>接下來照い形變</th></tr>
+            <tr><td class="form">〜たい</td><td>飲み<b>たい</b></td><td>飲みた<b>くない</b>／飲みた<b>かった</b></td></tr>
+            <tr><td class="form">〜ない</td><td>飲ま<b>ない</b></td><td>飲まな<b>かった</b>／飲まな<b>くて</b></td></tr>
+            <tr><td class="form">〜やすい／にくい</td><td>飲み<b>やすい</b></td><td>飲みやす<b>くない</b>／飲みやす<b>かった</b></td></tr>
+          </table>
+        </div>
+        <div class="mini xref">📖 動詞的變化與結果詞性 → 見「<b>用法例句</b>」分頁的「STEP ③ 接完之後變成什麼詞」。</div>
       </div>
     </details>
   </div>
