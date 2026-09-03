@@ -1,0 +1,143 @@
+/* ── 共用外殼：三個頁面統一的頁首、導覽、間距、目錄 ──────────────
+   載入順序在各頁 inline <style> 之後，用來覆寫成一致的版面。      */
+
+:root{
+  --shell-max: 760px;
+  --shell-pad: 16px;
+  --radius: 12px;
+  /* 全站統一主色（原本問題筆記是藍色，造成三頁看起來像三個網站） */
+  --accent:#c9553d; --accent-soft:#f9e8e3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --accent:#e8735c; --accent-soft:#3a2a26; }
+}
+:root[data-theme="dark"]{ --accent:#e8735c; --accent-soft:#3a2a26; }
+
+body{ padding-top:0; }
+
+/* ── 頁首：細長的置頂列，捲到哪都能換頁 ── */
+.topbar{
+  position:sticky; top:0; z-index:60;
+  background:color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter:saturate(140%) blur(8px);
+  border-bottom:1px solid var(--border, var(--line, #e5e0d8));
+}
+.topbar-in{
+  max-width:var(--shell-max); margin:0 auto;
+  padding:8px var(--shell-pad);
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.brand{
+  font-size:0.95rem; font-weight:700; letter-spacing:0.02em;
+  color:var(--text); text-decoration:none; white-space:nowrap;
+}
+.brand .n{ font-size:0.65rem; color:var(--muted); font-weight:600; margin-left:4px; }
+.topnav{ display:flex; gap:2px; margin-left:auto; flex-wrap:wrap; }
+.topnav a{
+  font-size:0.82rem; text-decoration:none; color:var(--muted);
+  padding:5px 11px; border-radius:999px; white-space:nowrap;
+}
+.topnav a:hover{ color:var(--text); background:var(--accent-soft); }
+.topnav a.here{ color:var(--accent); background:var(--accent-soft); font-weight:700; }
+
+/* 舊的頁面大標題與導覽已被 topbar 取代，整塊隱藏，省下一個螢幕的高度 */
+body > header, .wrap > header{ display:none !important; }
+
+/* ── 內容區：三頁同寬 ── */
+.wrap{ max-width:var(--shell-max) !important; }
+main, .controls, .wrap, .tabs, .panel{ padding-left:var(--shell-pad); padding-right:var(--shell-pad); }
+.wrap > *{ padding-left:0; padding-right:0; }
+.wrap{ padding:0 var(--shell-pad); }
+
+/* ── 搜尋列：黏在置頂列底下 ── */
+.controls{
+  position:sticky; top:41px; z-index:50;
+  max-width:var(--shell-max); margin:0 auto !important;
+  background:var(--bg);
+  padding:10px var(--shell-pad) 8px !important;
+  border-bottom:1px solid var(--border);
+}
+main{ margin-top:4px; }
+body.work .controls{ background:#fff; backdrop-filter:none; border-bottom:1px solid #ddd; }
+
+/* ── 動詞道場的分頁列：跟著捲動，長頁也能隨時換分頁 ── */
+.tabs{
+  position:sticky; top:41px; margin-top:0 !important; z-index:50;
+  background:color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter:blur(6px);
+  margin:12px calc(-1 * var(--shell-pad)) 10px !important;
+  padding:8px var(--shell-pad) !important;
+  border-bottom:1px solid var(--border);
+}
+
+/* ── 章節目錄（由 site.js 自動產生）── */
+.toc{
+  margin:10px 0 14px; padding:10px 12px;
+  border:1px dashed var(--border); border-radius:var(--radius);
+  background:transparent;
+}
+.toc-head{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  font-size:0.75rem; color:var(--muted); font-weight:700;
+}
+.toc-head .spacer{ margin-left:auto; }
+.toc-act{
+  font-size:0.72rem; padding:3px 9px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--border); background:transparent; color:var(--muted);
+}
+.toc-act:hover{ color:var(--accent); border-color:var(--accent); }
+.toc-links{ display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+.toc-links a{
+  font-size:0.76rem; text-decoration:none; color:var(--text);
+  padding:3px 10px; border-radius:999px; background:var(--accent-soft);
+}
+.toc-links a:hover{ background:var(--accent); color:#fff; }
+
+/* 捲動定位時不要被置頂列蓋住 */
+.sec-h, details.sec, [id^="sec-"]{ scroll-margin-top:96px; }
+
+/* ── 降低盒中盒的層次感：外層卡片不再加底色，只留一條線 ── */
+.card{ border-radius:var(--radius) !important; }
+main .card{ margin-top:12px !important; }
+
+/* ── 回到頂端 ── */
+.to-top{
+  position:fixed; right:16px; bottom:104px; z-index:70;
+  width:38px; height:38px; border-radius:50%;
+  border:1px solid var(--border); background:var(--card); color:var(--muted);
+  cursor:pointer; font-size:1rem; line-height:1;
+  opacity:0; pointer-events:none; transition:opacity .2s;
+}
+.to-top.show{ opacity:1; pointer-events:auto; }
+.to-top:hover{ color:var(--accent); border-color:var(--accent); }
+
+/* ── 手機 ── */
+@media (max-width:600px){
+  :root{ --shell-pad:12px; }
+  .topbar-in{ gap:8px; padding:6px var(--shell-pad); }
+  .brand{ font-size:0.88rem; }
+  .topnav{ margin-left:auto; }
+  .topnav a{ padding:4px 8px; font-size:0.76rem; }
+  header{ padding-top:14px !important; }
+  header h1{ font-size:1.05rem !important; }
+  .tabs{ top:37px; }
+  .controls{ top:37px; }
+  /* 手機不要讓分頁列擠成兩排吃掉螢幕，改成單排橫向捲動 */
+  .tabs{ flex-wrap:nowrap !important; overflow-x:auto; scrollbar-width:none; }
+  .tabs::-webkit-scrollbar{ display:none; }
+  .tab{ flex:0 0 auto !important; min-width:0 !important; white-space:nowrap; font-size:0.82rem; padding:6px 12px !important; }
+  .toc-links a{ max-width:100%; }
+}
+
+/* ── 摸魚模式：外殼也要跟著變黑白樸素 ── */
+body.work .topbar{ background:#fff; backdrop-filter:none; border-bottom:1px solid #d9d9d9; }
+body.work .brand{ color:#202020; }
+body.work .topnav a{ color:#555; background:none; }
+body.work .topnav a.here{ color:#202020; background:#eee; font-weight:600; }
+body.work .toc{ border:1px solid #ddd; }
+body.work .toc-links a{ background:#eee; color:#333; }
+body.work .tabs{ background:#fff; backdrop-filter:none; border-bottom:1px solid #ddd; }
+body.work .to-top{ background:#fff; border-color:#ccc; color:#555; }
+
+/* ── 列印：外殼不印 ── */
+@media print{ .topbar, .tabs, .toc, .to-top, .theme-toggle, .work-toggle{ display:none !important; } }
