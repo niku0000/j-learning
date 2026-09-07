@@ -95,6 +95,18 @@
   .theme-toggle { position:fixed; right:14px; bottom:54px; z-index:50; width:34px; height:34px; border-radius:999px; background:var(--card); color:var(--muted); border:1px solid var(--border); cursor:pointer; opacity:0.5; font-size:1rem; display:flex; align-items:center; justify-content:center; }
   .theme-toggle:hover { opacity:1; }
   body.work .theme-toggle { display:none; }
+
+  /* 對照表 */
+  .tbl-block { margin: 10px 0 14px; }
+  .tbl-title { font-size: 0.84rem; font-weight: 700; margin-bottom: 5px; }
+  .tblwrap { overflow-x: auto; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 9px; text-align: left; vertical-align: top; }
+  table.cmp th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; }
+  table.cmp td:first-child { white-space: nowrap; }
+  /* 說明裡的換行要保留 */
+  .a, .background, .rules li, .examples li { white-space: pre-line; }
+  body.work table.cmp th { background: #eee; }
 </style>
 <link rel="stylesheet" href="site.css">
 </head>
@@ -127,7 +139,10 @@ async function load() {
   try {
     const res = await fetch("questions.json?_=" + Date.now());
     const data = await res.json();
-    ITEMS = (data.questions || []).slice().reverse();
+    // 依日期排序（新→舊），不依賴 JSON 檔的擺放順序
+    ITEMS = (data.questions || []).slice().sort((a, b) =>
+      String(b.date || "").localeCompare(String(a.date || "")) ||
+      String(b.id || "").localeCompare(String(a.id || "")));
   } catch (e) {
     document.getElementById("list").innerHTML = '<div class="empty">無法載入 questions.json<br>' + e + '</div>';
     return;
@@ -169,6 +184,15 @@ function render() {
 function cardHTML(e) {
   const rules = (e.rules||[]).map(r => `<li>${esc(r)}</li>`).join("");
   const examples = (e.examples||[]).map(x => `<li>${esc(x)}</li>`).join("");
+  // tables: [{title, head:[], rows:[[]]}] —— 對照表型的筆記用
+  const tables = (e.tables||[]).map(t => `
+    <div class="tbl-block">
+      ${t.title ? `<div class="tbl-title">${esc(t.title)}</div>` : ""}
+      <div class="tblwrap"><table class="cmp"><tr>${
+        t.head.map(h => `<th>${esc(h)}</th>`).join("")}</tr>${
+        t.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")
+      }</table></div>
+    </div>`).join("");
   const tags = (e.tags||[]).map(t => `<span class="card-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("");
   return `
   <div class="card">
@@ -176,6 +200,7 @@ function cardHTML(e) {
     ${e.context ? `<div class="context">${esc(e.context)}</div>` : ""}
     <div class="q">${esc(e.question)}</div>
     ${e.answer ? `<div class="a">${esc(e.answer)}</div>` : ""}
+    ${tables ? `<details class="sec" open><summary>對照表 <span class="cnt">${(e.tables||[]).length}</span></summary>${tables}</details>` : ""}
     ${examples ? `<details class="sec" open><summary>例句 <span class="cnt">${(e.examples||[]).length}</span></summary><ul class="examples">${examples}</ul></details>` : ""}
     ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${esc(e.background)}</div></details>` : ""}
     ${rules ? `<details class="sec"><summary>排列/規律重點 <span class="cnt">${(e.rules||[]).length}</span></summary><ul class="rules">${rules}</ul></details>` : ""}

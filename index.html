@@ -269,7 +269,10 @@ async function load() {
   try {
     const res = await fetch("data.json?_=" + Date.now());
     const data = await res.json();
-    ENTRIES = (data.entries || []).slice().reverse(); // 最新在上
+    // 依日期排序（新→舊），不依賴 JSON 檔的擺放順序
+    ENTRIES = (data.entries || []).slice().sort((a, b) =>
+      String(b.date || "").localeCompare(String(a.date || "")) ||
+      String(b.id || "").localeCompare(String(a.id || "")));
   } catch (e) {
     document.getElementById("list").innerHTML =
       '<div class="empty">無法載入 data.json<br>' + e + '</div>';
