@@ -157,8 +157,9 @@
     font-weight: 700; color: var(--grammar-accent);
     font-size: 0.98rem; margin-bottom: 4px;
   }
-  .g-explain { font-size: 0.92rem; }
-  .background {
+  /* 說明裡的換行要保留，條列才不會擠成一整段 */
+  .g-explain { font-size: 0.92rem; white-space: pre-line; }
+  .background { white-space: pre-line;
     background: var(--grammar-bg); border-radius: 12px;
     padding: 12px 14px; margin-top: 8px; font-size: 0.9rem;
   }
@@ -224,6 +225,17 @@
   body.work .card-tag { background: #f0f0f0; color: #777; border-radius: 2px; }
   body.work .note { color: #999; }
   body.work .work-toggle { background: #fff; color: #999; border: 1px solid #d0d0d0; opacity: 0.4; }
+
+  /* 對照表與圖解 */
+  .tblwrap { overflow-x: auto; }
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 6px 0 4px; }
+  table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 9px; text-align: left; vertical-align: top; }
+  table.cmp th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; }
+  .fig { margin: 8px 0 0; }
+  .fig img { width: 100%; border: 1px solid var(--border); border-radius: 10px; display: block; }
+  .fig figcaption { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+  body.work table.cmp th { background: #eee; }
+  body.work .fig img { border-radius: 0; filter: grayscale(1); }
 </style>
 <link rel="stylesheet" href="site.css">
 </head>
@@ -331,6 +343,13 @@ function cardHTML(e) {
       <div class="g-point">${esc(g.point)}</div>
       <div class="g-explain">${esc(g.explain)}</div>
     </div>`).join("");
+  // 對照表（entry.table = {head:[], rows:[[]]}），適合單字組整理型的筆記
+  const table = e.table ? `<div class="tblwrap"><table class="cmp"><tr>` +
+    e.table.head.map(h => `<th>${esc(h)}</th>`).join("") + `</tr>` +
+    e.table.rows.map(r => `<tr>` + r.map(c => `<td>${esc(c)}</td>`).join("") + `</tr>`).join("") +
+    `</table></div>` : "";
+  const image = e.image ? `<figure class="fig"><img src="${esc(e.image)}" alt="${esc(e.imageAlt || "")}" loading="lazy">` +
+    (e.imageCredit ? `<figcaption>${esc(e.imageCredit)}</figcaption>` : "") + `</figure>` : "";
   const tags = (e.tags || []).map(t =>
     `<span class="card-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("");
   return `
@@ -343,7 +362,9 @@ function cardHTML(e) {
     ${e.reading ? `<div class="reading">${esc(e.reading)}</div>` : ""}
     ${e.translation ? `<div class="translation">${esc(e.translation)}</div>` : ""}
     ${words ? `<details class="sec"><summary>單字拆解 <span class="cnt">${(e.words||[]).length}</span></summary>${words}</details>` : ""}
+    ${table ? `<details class="sec" open><summary>對照表</summary>${table}</details>` : ""}
     ${grammar ? `<details class="sec"><summary>文法・句型 <span class="cnt">${(e.grammar||[]).length}</span></summary>${grammar}</details>` : ""}
+    ${image ? `<details class="sec"><summary>圖解</summary>${image}</details>` : ""}
     ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${esc(e.background)}</div></details>` : ""}
     ${e.note ? `<div class="note">${esc(e.note)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
