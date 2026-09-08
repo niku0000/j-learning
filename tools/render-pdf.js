@@ -19,8 +19,10 @@ function findChrome() {
 }
 
 const JOBS = [
-  { src: "worksheet.html",         out: "n4-verb-drill-01-questions.pdf" },
-  { src: "worksheet-answers.html", out: "n4-verb-drill-01-answers.pdf"   }
+  { src: "worksheet.html",            out: "n4-verb-drill-01-questions.pdf" },
+  { src: "worksheet-answers.html",    out: "n4-verb-drill-01-answers.pdf"   },
+  { src: "n5-worksheet.html",         out: "n5-grammar-01-questions.pdf"    },
+  { src: "n5-worksheet-answers.html", out: "n5-grammar-01-answers.pdf"      }
 ];
 
 (async () => {
