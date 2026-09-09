@@ -19,7 +19,7 @@
     bar.className = "topbar";
     bar.innerHTML =
       '<div class="topbar-in">' +
-        '<a class="brand" href="index.html">日本語ノート<span class="n">N4</span></a>' +
+        '<a class="brand" href="index.html">日本語ノート<span class="n">N5・N4</span></a>' +
         '<nav class="topnav">' +
           PAGES.map(function (p) {
             return '<a href="' + p.href + '"' +

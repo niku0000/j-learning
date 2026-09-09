@@ -123,6 +123,19 @@
   body.work .bar i.ok{background:#555;} body.work .bar i.mid{background:#aaa;}
   body.work .fchip.on{background:#555; border-color:#555;}
   body.work .seen{background:#eee; color:#333;}
+
+  .fgroup{display:inline-flex; gap:4px;}
+  .fsep{width:1px; height:18px; background:var(--border); margin:0 4px;}
+  .lchip{font-size:0.78rem; padding:4px 13px; border-radius:999px; border:1px solid var(--border);
+         background:transparent; color:var(--muted); cursor:pointer; font-weight:700;}
+  .lchip.on{background:var(--text); border-color:var(--text); color:var(--bg);}
+  .lv{display:inline-block; font-size:0.64rem; font-weight:800; letter-spacing:.03em;
+      padding:1px 6px; border-radius:4px; border:1px solid var(--border); color:var(--muted);}
+  .lv.N5{background:var(--good-soft); color:var(--good); border-color:transparent;}
+  .lv.N4{background:var(--accent-soft); color:var(--accent); border-color:transparent;}
+  .grp .glv{font-size:0.68rem;}
+  body.work .lchip.on{background:#555; border-color:#555; color:#fff;}
+  body.work .lv.N5,body.work .lv.N4{background:#eee; color:#333;}
 </style>
 <link rel="stylesheet" href="site.css">
 </head>
@@ -130,7 +143,7 @@
 <div class="wrap">
 
   <div class="dash">
-    <h2>N4 重點文法覆蓋率</h2>
+    <h2 id="dashTitle">N5・N4 重點文法覆蓋率</h2>
     <div class="bar" id="allBar"></div>
     <div class="legend">
       <span><span class="dot ok"></span>熟練 <b id="cOk">0</b></span>
@@ -142,7 +155,13 @@
   </div>
 
   <div class="filters">
-    <button class="fchip on" data-f="all">全部</button>
+    <span class="fgroup">
+      <button class="lchip on" data-l="all">全部</button>
+      <button class="lchip" data-l="N5">N5</button>
+      <button class="lchip" data-l="N4">N4</button>
+    </span>
+    <span class="fsep"></span>
+    <button class="fchip on" data-f="all">不分狀態</button>
     <button class="fchip" data-f="0">未學</button>
     <button class="fchip" data-f="1">學習中</button>
     <button class="fchip" data-f="2">熟練</button>
@@ -163,7 +182,7 @@
 <script>
 const LS_STATE = "n4grammar.state";
 const LABELS = ["未學", "學習中", "熟練"];
-let DATA = null, SEEN = {}, state = {}, filter = "all", kw = "";
+let DATA = null, SEEN = {}, state = {}, filter = "all", level = "all", kw = "";
 
 try { state = JSON.parse(localStorage.getItem(LS_STATE) || "{}"); } catch (e) { state = {}; }
 function saveState() { try { localStorage.setItem(LS_STATE, JSON.stringify(state)); } catch (e) {} }
@@ -204,9 +223,10 @@ function seenCount(item) {
 function itemHTML(it) {
   const s = st(it.id);
   const n = seenCount(it);
-  return '<div class="item" data-id="' + esc(it.id) + '" data-state="' + s + '" data-text="' +
+  return '<div class="item" data-id="' + esc(it.id) + '" data-state="' + s + '" data-level="' + esc(it.level || "N4") + '" data-text="' +
       esc(it.jp + " " + it.zh + " " + (it.ex || []).map(e => e.jp + e.zh).join(" ")) + '">' +
     '<div class="ihead">' +
+      '<span class="lv ' + esc(it.level || "N4") + '">' + esc(it.level || "N4") + '</span>' +
       '<span class="ijp">' + rich(it.jp) + '</span>' +
       (n ? '<a class="seen" href="index.html?q=' + encodeURIComponent(seenKey(it)) +
            '" title="到學習記錄看這 ' + n + ' 則">📗 記錄 ' + n + '</a>' : '') +
@@ -235,7 +255,8 @@ function tableHTML(t) {
 
 function groupHTML(g) {
   return '<details class="grp" id="g-' + esc(g.key) + '" open>' +
-    '<summary><span class="gt">' + esc(g.title) + '</span>' +
+    '<summary><span class="lv glv ' + esc((g.level || "N4").replace("・","-")) + '">' + esc(g.level || "N4") + '</span>' +
+      '<span class="gt">' + esc(g.title) + '</span>' +
       '<span class="gsub">' + esc(g.sub || "") + '</span>' +
       '<span class="gcount" data-count="' + esc(g.key) + '"></span></summary>' +
     '<div class="body">' +
@@ -253,10 +274,17 @@ function barHTML(items) {
          '<i class="mid" style="width:' + (mid / n * 100) + '%"></i>';
 }
 
+// 依目前的級數篩選取出項目
+function inLevel(items) {
+  return level === "all" ? items : items.filter(i => (i.level || "N4") === level);
+}
+
 function refreshStats() {
-  const all = DATA.groups.flatMap(g => g.items);
+  const all = inLevel(DATA.groups.flatMap(g => g.items));
   const ok = all.filter(i => st(i.id) === 2).length;
   const mid = all.filter(i => st(i.id) === 1).length;
+  document.getElementById("dashTitle").textContent =
+    (level === "all" ? "N5・N4" : level) + " 重點文法覆蓋率";
   document.getElementById("allBar").innerHTML = barHTML(all);
   document.getElementById("cOk").textContent = ok;
   document.getElementById("cMid").textContent = mid;
@@ -264,16 +292,19 @@ function refreshStats() {
   document.getElementById("cAll").textContent = all.length;
 
   document.getElementById("gridsum").innerHTML = DATA.groups.map(g => {
-    const done = g.items.filter(i => st(i.id) === 2).length;
+    const items = inLevel(g.items);
+    if (!items.length) return "";
+    const done = items.filter(i => st(i.id) === 2).length;
     return '<div class="gs" data-go="' + g.key + '">' +
       '<div class="t">' + esc(g.title) + '</div>' +
-      '<div class="n">' + done + " / " + g.items.length + ' 熟練</div>' +
-      '<div class="bar">' + barHTML(g.items) + '</div></div>';
+      '<div class="n">' + done + " / " + items.length + ' 熟練</div>' +
+      '<div class="bar">' + barHTML(items) + '</div></div>';
   }).join("");
 
   DATA.groups.forEach(g => {
     const el = document.querySelector('[data-count="' + g.key + '"]');
-    if (el) el.textContent = g.items.filter(i => st(i.id) === 2).length + " / " + g.items.length;
+    const items = inLevel(g.items);
+    if (el) el.textContent = items.filter(i => st(i.id) === 2).length + " / " + items.length;
   });
 }
 
@@ -282,13 +313,14 @@ function applyFilter() {
     let shown = 0;
     grp.querySelectorAll(".item").forEach(it => {
       const okState = filter === "all" || String(st(it.dataset.id)) === filter;
+      const okLevel = level === "all" || it.dataset.level === level;
       const okKw = !kw || it.dataset.text.toLowerCase().indexOf(kw) >= 0;
-      const show = okState && okKw;
+      const show = okState && okLevel && okKw;
       it.classList.toggle("hidden", !show);
       if (show) shown++;
     });
     grp.classList.toggle("hidden", shown === 0);
-    if (shown && (kw || filter !== "all")) grp.open = true;
+    if (shown && (kw || filter !== "all" || level !== "all")) grp.open = true;
   });
 }
 
@@ -324,6 +356,14 @@ document.querySelectorAll(".fchip").forEach(c => c.addEventListener("click", () 
   document.querySelectorAll(".fchip").forEach(x => x.classList.remove("on"));
   c.classList.add("on");
   filter = c.dataset.f;
+  applyFilter();
+}));
+
+document.querySelectorAll(".lchip").forEach(c => c.addEventListener("click", () => {
+  document.querySelectorAll(".lchip").forEach(x => x.classList.remove("on"));
+  c.classList.add("on");
+  level = c.dataset.l;
+  refreshStats();
   applyFilter();
 }));
 
