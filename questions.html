@@ -166,6 +166,8 @@ function renderTags() {
   });
 }
 function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+// 資料裡刻意允許 <b> 與 <br> 當排版標記，跳脫後再還原這兩個
+function rich(s){ return esc(s).replace(/&lt;(\/?)b&gt;/g,"<$1b>").replace(/&lt;br\s*\/?&gt;/g,"<br>"); }
 function matches(e) {
   if (activeTag && !(e.tags||[]).includes(activeTag)) return false;
   if (!query) return true;
@@ -182,15 +184,15 @@ function render() {
   list.querySelectorAll(".card-tag").forEach(el => el.onclick = () => { activeTag = el.dataset.tag; renderTags(); render(); window.scrollTo({top:0,behavior:"smooth"}); });
 }
 function cardHTML(e) {
-  const rules = (e.rules||[]).map(r => `<li>${esc(r)}</li>`).join("");
-  const examples = (e.examples||[]).map(x => `<li>${esc(x)}</li>`).join("");
+  const rules = (e.rules||[]).map(r => `<li>${rich(r)}</li>`).join("");
+  const examples = (e.examples||[]).map(x => `<li>${rich(x)}</li>`).join("");
   // tables: [{title, head:[], rows:[[]]}] —— 對照表型的筆記用
   const tables = (e.tables||[]).map(t => `
     <div class="tbl-block">
       ${t.title ? `<div class="tbl-title">${esc(t.title)}</div>` : ""}
       <div class="tblwrap"><table class="cmp"><tr>${
-        t.head.map(h => `<th>${esc(h)}</th>`).join("")}</tr>${
-        t.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")
+        t.head.map(h => `<th>${rich(h)}</th>`).join("")}</tr>${
+        t.rows.map(r => `<tr>${r.map(c => `<td>${rich(c)}</td>`).join("")}</tr>`).join("")
       }</table></div>
     </div>`).join("");
   const tags = (e.tags||[]).map(t => `<span class="card-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join("");
@@ -199,12 +201,12 @@ function cardHTML(e) {
     <div class="card-top"><span class="topic">${esc(e.topic||"問題")}</span><span class="meta">${esc(e.date||"")}</span></div>
     ${e.context ? `<div class="context">${esc(e.context)}</div>` : ""}
     <div class="q">${esc(e.question)}</div>
-    ${e.answer ? `<div class="a">${esc(e.answer)}</div>` : ""}
+    ${e.answer ? `<div class="a">${rich(e.answer)}</div>` : ""}
     ${tables ? `<details class="sec" open><summary>對照表 <span class="cnt">${(e.tables||[]).length}</span></summary>${tables}</details>` : ""}
     ${examples ? `<details class="sec" open><summary>例句 <span class="cnt">${(e.examples||[]).length}</span></summary><ul class="examples">${examples}</ul></details>` : ""}
-    ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${esc(e.background)}</div></details>` : ""}
+    ${e.background ? `<details class="sec"><summary>背景・語源</summary><div class="background">${rich(e.background)}</div></details>` : ""}
     ${rules ? `<details class="sec"><summary>排列/規律重點 <span class="cnt">${(e.rules||[]).length}</span></summary><ul class="rules">${rules}</ul></details>` : ""}
-    ${e.summary ? `<div class="summary">${esc(e.summary)}</div>` : ""}
+    ${e.summary ? `<div class="summary">${rich(e.summary)}</div>` : ""}
     ${tags ? `<div class="card-tags">${tags}</div>` : ""}
   </div>`;
 }
