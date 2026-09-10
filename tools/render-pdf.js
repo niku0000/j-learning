@@ -22,7 +22,9 @@ const JOBS = [
   { src: "worksheet.html",            out: "n4-verb-drill-01-questions.pdf" },
   { src: "worksheet-answers.html",    out: "n4-verb-drill-01-answers.pdf"   },
   { src: "n5-worksheet.html",         out: "n5-grammar-01-questions.pdf"    },
-  { src: "n5-worksheet-answers.html", out: "n5-grammar-01-answers.pdf"      }
+  { src: "n5-worksheet-answers.html", out: "n5-grammar-01-answers.pdf"      },
+  { src: "n5-review.html",            out: "n5-review-02-questions.pdf"     },
+  { src: "n5-review-answers.html",    out: "n5-review-02-answers.pdf"       }
 ];
 
 (async () => {
