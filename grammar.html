@@ -136,6 +136,32 @@
   .grp .glv{font-size:0.68rem;}
   body.work .lchip.on{background:#555; border-color:#555; color:#fff;}
   body.work .lv.N5,body.work .lv.N4{background:#eee; color:#333;}
+
+  /* 進度備份 */
+  .backup{margin:12px 0 4px; border:1px solid var(--border); border-radius:10px; background:var(--card); overflow:hidden;}
+  .backup>summary{list-style:none; cursor:pointer; padding:9px 12px; font-size:0.8rem; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .backup>summary::-webkit-details-marker{display:none;}
+  .backup>summary::before{content:"▶"; font-size:0.62rem; color:var(--muted); transition:transform .15s;}
+  .backup[open]>summary::before{transform:rotate(90deg);}
+  .backup .bt{font-weight:700;}
+  .backup .bs{margin-left:auto; font-size:0.74rem; color:var(--muted);}
+  .backup .bs.dirty{color:var(--warn); font-weight:700;}
+  .backup .bbody{padding:0 12px 12px; font-size:0.8rem;}
+  .backup .brow{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0;}
+  .bbtn{font-size:0.78rem; padding:6px 13px; border-radius:8px; cursor:pointer;
+        border:1px solid var(--border); background:transparent; color:var(--text);}
+  .bbtn.primary{border-color:var(--accent); color:var(--accent); font-weight:700;}
+  .bbtn:hover{background:var(--accent-soft);}
+  .backup textarea{width:100%; min-height:70px; font-family:ui-monospace,Menlo,Consolas,monospace;
+    font-size:0.72rem; padding:8px; border:1px solid var(--border); border-radius:8px;
+    background:var(--bg); color:var(--text); resize:vertical;}
+  .backup .bnote{font-size:0.74rem; color:var(--muted); line-height:1.6;}
+  .backup .bmsg{font-size:0.76rem; margin-top:6px; min-height:1.2em;}
+  .backup .bmsg.ok{color:var(--good); font-weight:700;}
+  .backup .bmsg.err{color:var(--warn); font-weight:700;}
+  .storewarn{margin:10px 0; padding:9px 12px; border-radius:8px; font-size:0.8rem;
+    background:var(--warn-soft); border-left:3px solid var(--warn);}
+  body.work .backup{border:1px solid #ddd;} body.work .bbtn.primary{border-color:#555; color:#333;}
 </style>
 <link rel="stylesheet" href="site.css">
 </head>
@@ -153,6 +179,29 @@
     </div>
     <div class="gridsum" id="gridsum"></div>
   </div>
+
+  <details class="backup" id="backupBox">
+    <summary><span class="bt">💾 進度備份</span>
+      <span class="bs" id="backupStat">—</span></summary>
+    <div class="bbody">
+      <div class="bnote">
+        學習狀態平常存在<b>這台裝置的瀏覽器</b>裡。換手機／換瀏覽器／瀏覽器清除資料時就會不見。<br>
+        想長期保存或跨裝置同步：按<b>複製進度</b>，把內容貼給 Claude，我會寫進 <code>progress.json</code> 並 push，
+        之後任何裝置打開都會自動帶入。
+      </div>
+      <div class="brow">
+        <button class="bbtn primary" id="btnCopy">📋 複製進度</button>
+        <button class="bbtn" id="btnShow">顯示 / 隱藏內容</button>
+        <button class="bbtn" id="btnReset">清除本機標記</button>
+      </div>
+      <textarea id="backupText" class="hidden" spellcheck="false"></textarea>
+      <div class="brow">
+        <button class="bbtn" id="btnApply">貼上還原</button>
+        <span class="bnote">（把備份內容貼進上面框裡，再按這顆）</span>
+      </div>
+      <div class="bmsg" id="backupMsg"></div>
+    </div>
+  </details>
 
   <div class="filters">
     <span class="fgroup">
@@ -172,7 +221,7 @@
 </div>
 
 <footer>
-  資料來源：grammar.json ・ 學習狀態存在這台裝置的瀏覽器裡<br>
+  資料來源：grammar.json ・ 學習狀態存在這台裝置的瀏覽器，並以 progress.json 為雲端基準<br>
   動詞怎麼<b>變化</b>（ます形・て形・可能形…）在「動詞道場」，這裡只放<b>句型用法</b>
 </footer>
 
@@ -181,12 +230,74 @@
 
 <script>
 const LS_STATE = "n4grammar.state";
+// localStorage 在無痕／隱私設定下可能連「讀取屬性」都會丟例外，
+// 一律走這三個包裝，確保頁面在完全不能存檔時仍然正常顯示內容。
+function lsGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { window.localStorage.setItem(k, v); return true; } catch (e) { return false; } }
+function lsDel(k) { try { window.localStorage.removeItem(k); } catch (e) {} }
 const LABELS = ["未學", "學習中", "熟練"];
 let DATA = null, SEEN = {}, state = {}, filter = "all", level = "all", kw = "";
+// BASE＝progress.json 的雲端基準；local＝這台裝置的改動，覆蓋在基準之上
+let BASE = {}, storageOK = true;
 
-try { state = JSON.parse(localStorage.getItem(LS_STATE) || "{}"); } catch (e) { state = {}; }
-function saveState() { try { localStorage.setItem(LS_STATE, JSON.stringify(state)); } catch (e) {} }
+function loadLocal() {
+  try { return JSON.parse(lsGet(LS_STATE) || "{}"); } catch (e) { return {}; }
+}
+function rebuildState() { state = Object.assign({}, BASE, loadLocal()); }
+rebuildState();
+
+function saveState() {
+  // 只把「跟基準不同」的項目寫進本機，避免基準更新後被舊值蓋住
+  const diff = {};
+  Object.keys(state).forEach(k => { if (state[k] !== (BASE[k] || 0)) diff[k] = state[k]; });
+  if (lsSet(LS_STATE, JSON.stringify(diff))) {
+    if (!storageOK) { storageOK = true; renderStoreWarn(); }
+  } else {
+    storageOK = false;
+    renderStoreWarn();
+  }
+  renderBackupStat();
+}
 function st(id) { return state[id] === undefined ? 0 : state[id]; }
+
+function renderStoreWarn() {
+  let el = document.getElementById("storeWarn");
+  if (storageOK) { if (el) el.remove(); return; }
+  if (el) return;
+  el = document.createElement("div");
+  el.id = "storeWarn";
+  el.className = "storewarn";
+  el.innerHTML = "⚠ <b>這個瀏覽器不讓網頁儲存資料</b>（可能是無痕模式或隱私設定），" +
+                 "標記<b>關掉分頁就會消失</b>。請在「💾 進度備份」按『複製進度』留一份，或改用一般模式開啟。";
+  const box = document.getElementById("backupBox");
+  box.parentNode.insertBefore(el, box);
+}
+
+/* ── 進度備份 ── */
+function localDiffCount() {
+  const local = loadLocal();
+  return Object.keys(local).filter(k => local[k] !== (BASE[k] || 0)).length;
+}
+function renderBackupStat() {
+  const el = document.getElementById("backupStat");
+  if (!el) return;
+  const baseN = Object.keys(BASE).filter(k => BASE[k]).length;
+  const diff = localDiffCount();
+  el.textContent = diff
+    ? `雲端 ${baseN} 項・本機另有 ${diff} 項未備份`
+    : (baseN ? `雲端 ${baseN} 項・已同步` : "尚未備份任何進度");
+  el.classList.toggle("dirty", diff > 0);
+}
+function backupJSON() {
+  const out = {};
+  Object.keys(state).forEach(k => { if (state[k]) out[k] = state[k]; });
+  return JSON.stringify(out, null, 1);
+}
+function setMsg(text, kind) {
+  const m = document.getElementById("backupMsg");
+  m.textContent = text;
+  m.className = "bmsg" + (kind ? " " + kind : "");
+}
 
 const esc = s => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -372,9 +483,58 @@ document.getElementById("gsearch").addEventListener("input", e => {
   applyFilter();
 });
 
+/* 進度備份按鈕 */
+(function () {
+  const ta = document.getElementById("backupText");
+  document.getElementById("btnShow").addEventListener("click", () => {
+    ta.classList.toggle("hidden");
+    if (!ta.classList.contains("hidden") && !ta.value) ta.value = backupJSON();
+  });
+  document.getElementById("btnCopy").addEventListener("click", async () => {
+    const txt = backupJSON();
+    ta.value = txt;
+    try {
+      await navigator.clipboard.writeText(txt);
+      setMsg("已複製！貼給 Claude 就能寫進 progress.json 永久保存。", "ok");
+    } catch (e) {
+      ta.classList.remove("hidden");
+      ta.select();
+      setMsg("這個瀏覽器不給自動複製，內容已顯示在下方，請手動選取複製。", "err");
+    }
+  });
+  document.getElementById("btnApply").addEventListener("click", () => {
+    // 框還藏著或還沒貼東西 → 先打開並聚焦，提示貼上
+    if (ta.classList.contains("hidden") || !ta.value.trim()) {
+      ta.classList.remove("hidden");
+      ta.value = "";
+      ta.focus();
+      setMsg("請把備份內容貼進上面的框，然後再按一次「貼上還原」。", "err");
+      return;
+    }
+    let obj;
+    try { obj = JSON.parse(ta.value); }
+    catch (e) { setMsg("讀不懂這段內容，請確認是完整的 JSON。", "err"); return; }
+    if (!obj || typeof obj !== "object") { setMsg("內容格式不對。", "err"); return; }
+    const src = obj.state && typeof obj.state === "object" ? obj.state : obj;
+    let n = 0;
+    Object.keys(src).forEach(k => {
+      const v = Number(src[k]);
+      if (v === 0 || v === 1 || v === 2) { state[k] = v; n++; }
+    });
+    saveState(); render();
+    setMsg(`已還原 ${n} 項。`, "ok");
+  });
+  document.getElementById("btnReset").addEventListener("click", () => {
+    if (!confirm("清除這台裝置的標記？\n（progress.json 的雲端基準會保留，畫面會退回基準狀態）")) return;
+    lsDel(LS_STATE);
+    rebuildState(); render();
+    setMsg("已清除本機標記，退回雲端基準。", "ok");
+  });
+})();
+
 /* 深色 / 摸魚 */
 (function () {
-  const t = localStorage.getItem("n4.theme");
+  const t = lsGet("n4.theme");
   if (t) document.documentElement.setAttribute("data-theme", t);
   const tb = document.getElementById("themeToggle");
   function sync() {
@@ -388,7 +548,7 @@ document.getElementById("gsearch").addEventListener("input", e => {
     const cur = document.documentElement.getAttribute("data-theme");
     const next = cur === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("n4.theme", next);
+    lsSet("n4.theme", next);
     sync();
   });
 
@@ -396,9 +556,9 @@ document.getElementById("gsearch").addEventListener("input", e => {
   function setWork(on) {
     document.body.classList.toggle("work", on);
     wb.textContent = on ? "一般模式" : "摸魚模式";
-    localStorage.setItem("n4.work", on ? "1" : "0");
+    lsSet("n4.work", on ? "1" : "0");
   }
-  setWork(localStorage.getItem("n4.work") === "1");
+  setWork(lsGet("n4.work") === "1");
   wb.addEventListener("click", () => setWork(!document.body.classList.contains("work")));
   document.addEventListener("keydown", e => {
     if (e.key === "Escape") setWork(!document.body.classList.contains("work"));
@@ -408,11 +568,18 @@ document.getElementById("gsearch").addEventListener("input", e => {
 /* 載入 */
 Promise.all([
   fetch("grammar.json").then(r => r.json()),
-  fetch("data.json").then(r => r.json()).catch(() => ({ entries: [] }))
-]).then(([g, d]) => {
+  fetch("data.json").then(r => r.json()).catch(() => ({ entries: [] })),
+  fetch("progress.json?_=" + Date.now()).then(r => r.json()).catch(() => ({ state: {} }))
+]).then(([g, d, prog]) => {
   DATA = g;
   SEEN = buildSeen(d.entries || []);
+  BASE = (prog && prog.state && typeof prog.state === "object") ? prog.state : {};
+  rebuildState();
+  // 測一次這個瀏覽器到底能不能寫入
+  if (!lsSet(LS_STATE + ".test", "1")) storageOK = false; else lsDel(LS_STATE + ".test");
+  renderStoreWarn();
   render();
+  renderBackupStat();
 }).catch(err => {
   document.getElementById("groups").innerHTML =
     '<p style="text-align:center;color:var(--muted)">無法載入 grammar.json<br>' + esc(err) + '</p>';
