@@ -26,7 +26,8 @@ const JOBS = [
   { src: "n5-review.html",            out: "n5-review-02-questions.pdf"     },
   { src: "n5-review-answers.html",    out: "n5-review-02-answers.pdf"       },
   { src: "n5-sakubun.html",           out: "n5-sakubun-03-questions.pdf"    },
-  { src: "n5-sakubun-answers.html",   out: "n5-sakubun-03-answers.pdf"      }
+  { src: "n5-sakubun-answers.html",   out: "n5-sakubun-03-answers.pdf"      },
+  { src: "n4-handout.html",           out: "n4-kiso-handout.pdf"            }
 ];
 
 (async () => {

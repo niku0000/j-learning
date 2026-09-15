@@ -1645,6 +1645,11 @@ applyWork(localStorage.getItem("workMode")==="1");
    新增練習卷時，把 PDF 放進 worksheets/，在這個陣列加一筆即可。 */
 const SHEETS = [
   {
+    title: "【講義】N4 基礎文法總表（不是考卷，是查表用）",
+    desc: "4 頁 A4，讀 N4 教材時放在旁邊對照用。第1頁 動詞分類・五段移動・ます/ない/辭書形・て形た形音便・常用動詞分類速查；第2頁 N4 全部活用形（可能・受身・使役・使役受身・意向・命令・禁止・ば・たら・たり）× 三類一次對照，＋「句型反查表」（要接這個尾巴時該用哪個形）＋四種「如果」的分辨；第3頁 名詞／い形／な形／動詞 四詞類 × 普通形・丁寧形完整表，＋形容詞副詞化・連接，＋常體敬體互換；第4頁 自他動詞（が／を 的選擇、ている／てある 的差別）＋48 組常用對照表。全部變化由變化引擎核對過。",
+    q: "worksheets/n4-kiso-handout.pdf"
+  },
+  {
     title: "第4卷　N5 造句練習（全部是造句題）",
     desc: "全 42 題／2 頁 A4。每題給中文與部分單字提示，自己寫出完整日文句子。涵蓋 N5 全部文法點：名詞句・形容詞句／指示語・移動・存在・比較／助詞／邀約提議／て形句型／ない形・希望／時間前後・ながら／授受動詞／こと・假設・引用・連體修飾・でしょう。解答卷附參考解答與每題對應的知識點，最後有涵蓋範圍清單。",
     q: "worksheets/n5-sakubun-03-questions.pdf",
@@ -1676,8 +1681,9 @@ function renderSheets() {
   box.innerHTML = SHEETS.map(s =>
     '<div class="sheet"><div class="st">' + s.title + '</div>' +
     '<div class="sd">' + s.desc + '</div><div class="dl">' +
-    '<a class="primary" href="' + s.q + '" target="_blank" rel="noopener">📄 題目 PDF</a>' +
-    '<a href="' + s.a + '" target="_blank" rel="noopener">✅ 解答・解析 PDF</a>' +
+    '<a class="primary" href="' + s.q + '" target="_blank" rel="noopener">' +
+    (s.a ? '📄 題目 PDF' : '📘 講義 PDF') + '</a>' +
+    (s.a ? '<a href="' + s.a + '" target="_blank" rel="noopener">✅ 解答・解析 PDF</a>' : '') +
     '</div></div>').join("");
 }
 renderSheets();
