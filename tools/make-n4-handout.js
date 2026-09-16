@@ -88,7 +88,7 @@ function table(head, rows, cls) {
   }).join("")}</tr>`).join("");
   return `<table class="${cls||""}">${th}${tr}</table>`;
 }
-const NP = 6;
+const NP = 7;
 function page(no, title, sub, body) {
   return `<div class="page"><div class="head"><div style="display:flex;align-items:baseline">`
     + `<h1>${title}</h1><span class="sub">${sub}</span></div>`
@@ -477,6 +477,80 @@ ${table(["方向","動詞","謙讓/尊敬版","物品","<b>恩惠（て形＋）
 </div>
 `;
 
+
+// ══════════ 第 7 頁：V1〜V5 語幹背誦表 ══════════
+// 来る 的讀音對照（key → 讀音）；同時檢查漢字形與引擎一致
+const KURU_YOMI = {
+  nai:"こない", nakatta:"こなかった", passive:"こられる", causative:"こさせる",
+  causPass:"こさせられる", potential:"こられる", volitional:"こよう",
+  masu:"きます", tai:"きたい", te:"きて", ta:"きた", tara:"きたら", tari:"きたり",
+  conditional:"くれば", imperative:"こい", kinshi:"くるな"
+};
+Object.keys(KURU_YOMI).forEach(k => { if (!conjugate(V("来る"), k)) throw new Error("来る 缺形 " + k); });
+console.log("✓ 来る 讀音對照 " + Object.keys(KURU_YOMI).length + " 項");
+// 来る：漢字形＋讀音
+function K(form) {
+  return `${C("来る", form)}<span style="font-size:6.3pt;color:#555">（${KURU_YOMI[form]}）</span>`;
+}
+const S = f => C("する", f);
+
+const P7 = `
+<div class="blk"><h2>㉓ 五個語幹：所有變化的起點</h2>
+<div class="tip"><b>日文動詞只有五個「語幹」（V1〜V5），所有變化都是「選一個語幹 ＋ 接一個尾巴」。</b>
+背變化不要一個一個背，<b>先把這張 5×6 的格子背熟</b>，之後只要記「哪個句型用哪個語幹」就好。
+第1類在<b>五段</b>上移動；<b>第2類五個語幹全部一樣</b>（去る即可），所以第2類其實不用背；第3類只有兩個字，但讀音會變，必須硬記。</div>
+${table(["語幹","段","第1類 書く","第1類 飲む","第1類 話す","第2類 食べる","第3類 する","第3類 来る"],[
+ [{v:"<b>V1</b><br><span style='font-size:6.6pt'>未然形</span>",c:"k"},"<b>あ</b>段","書<b>か</b>","飲<b>ま</b>","話<b>さ</b>",{v:"食べ<br><span style='font-size:6.3pt'>（去る）</span>",c:"n"},{v:"<b>し</b>／<b>さ</b><br><span style='font-size:6.3pt'>しない／させる</span>",c:"n"},{v:"<b>来</b><span style='font-size:6.3pt'>（こ）</span>",c:"n"}],
+ [{v:"<b>V2</b><br><span style='font-size:6.6pt'>連用形</span>",c:"k"},"<b>い</b>段","書<b>き</b>","飲<b>み</b>","話<b>し</b>",{v:"食べ",c:"n"},{v:"<b>し</b>",c:"n"},{v:"<b>来</b><span style='font-size:6.3pt'>（き）</span>",c:"n"}],
+ [{v:"<b>V3</b><br><span style='font-size:6.6pt'>終止・連体形</span>",c:"k"},"<b>う</b>段","書<b>く</b>","飲<b>む</b>","話<b>す</b>",{v:"食べ<b>る</b>",c:"n"},{v:"<b>する</b>",c:"n"},{v:"<b>来る</b><span style='font-size:6.3pt'>（くる）</span>",c:"n"}],
+ [{v:"<b>V4</b><br><span style='font-size:6.6pt'>仮定形</span>",c:"k"},"<b>え</b>段","書<b>け</b>","飲<b>め</b>","話<b>せ</b>",{v:"食べ<b>れ</b>",c:"n"},{v:"<b>すれ</b>",c:"n"},{v:"<b>来</b><span style='font-size:6.3pt'>（くれ）</span>",c:"n"}],
+ [{v:"<b>V5</b><br><span style='font-size:6.6pt'>意向形</span>",c:"k"},"<b>お</b>段","書<b>こ</b>","飲<b>も</b>","話<b>そ</b>",{v:"食べ<br><span style='font-size:6.3pt'>（＋よう）</span>",c:"n"},{v:"<b>し</b><br><span style='font-size:6.3pt'>（＋よう）</span>",c:"n"},{v:"<b>来</b><span style='font-size:6.3pt'>（こ（＋よう））</span>",c:"n"}]
+])}
+<div class="warn"><span class="lb">三個重點</span><b>1</b> 第2類（食べる）的 V1・V2・V5 全部都是「食べ」，所以<b>只要記「去る」</b>，差別在後面接什麼。
+　<b>2</b> 来る 的漢字都是「来」，<b>讀音卻有 こ・き・く 三種</b>——背的時候一定要唸出來。
+　<b>3</b> 買う 這類尾巴是「う」的，V1 是 <b>わ</b> 不是あ：買<b>わ</b>ない（✗買あない）。</div>
+</div>
+
+<div class="blk"><h2>㉔ 哪個語幹接哪個尾巴（完整對照）</h2>
+<div class="tip"><b>用法：左欄找你要的句型 → 中欄告訴你用哪個語幹＋接什麼 → 右邊四欄是三類的成品。</b>成品全部由變化引擎產生。</div>
+${table(["語幹","接什麼（句型）","第1類 書く","第2類 食べる","第3類 する","第3類 来る"],[
+ [{v:"<b>V1</b>",c:"k"},{v:"＋<b>ない</b>（否定）<br>＋<b>なかった</b>（過去否定）",c:"n"},{v:`${C(G1,"nai")}<br>${C(G1,"nakatta")}`,c:"n"},{v:`${C(G2,"nai")}<br>${C(G2,"nakatta")}`,c:"n"},{v:`${S("nai")}<br>${S("nakatta")}`,c:"n"},{v:`${K("nai")}<br>${K("nakatta")}`,c:"n"}],
+ [{v:"<b>V1</b>",c:"k"},{v:"＋<b>れる</b>（受身）<br>2･3類＋<b>られる</b>",c:"n"},{v:C(G1,"passive"),c:"n"},{v:C(G2,"passive"),c:"n"},{v:S("passive"),c:"n"},{v:K("passive"),c:"n"}],
+ [{v:"<b>V1</b>",c:"k"},{v:"＋<b>せる</b>（使役）<br>2･3類＋<b>させる</b>",c:"n"},{v:C(G1,"causative"),c:"n"},{v:C(G2,"causative"),c:"n"},{v:S("causative"),c:"n"},{v:K("causative"),c:"n"}],
+ [{v:"<b>V1</b>",c:"k"},{v:"＋<b>せられる</b>（使役受身）<br><span style='font-size:6.3pt'>1類口語：＋される</span>",c:"n"},{v:`${C(G1,"causPass")}<br><span style='font-size:6.3pt'>口語 書かされる</span>`,c:"n"},{v:C(G2,"causPass"),c:"n"},{v:S("causPass"),c:"n"},{v:K("causPass"),c:"n"}],
+ [{v:"<b>V2</b>",c:"k"},{v:"＋<b>ます</b>（丁寧）",c:"n"},{v:C(G1,"masu"),c:"n"},{v:C(G2,"masu"),c:"n"},{v:S("masu"),c:"n"},{v:K("masu"),c:"n"}],
+ [{v:"<b>V2</b>",c:"k"},{v:"＋<b>たい</b>（想做）",c:"n"},{v:C(G1,"tai"),c:"n"},{v:C(G2,"tai"),c:"n"},{v:S("tai"),c:"n"},{v:K("tai"),c:"n"}],
+ [{v:"<b>V2</b>",c:"k"},{v:"＋<b>ながら</b>／<b>すぎる</b>／<b>やすい・にくい</b>／<b>方</b>／<b>に行く</b>／<b>そうだ</b>(樣態)／<b>お〜になる・する</b>",c:"n"},{v:`書きながら・書きすぎる<br>書きやすい・書き方`,c:"n"},{v:`食べながら・食べすぎる<br>食べやすい・食べ方`,c:"n"},{v:"しながら・しすぎる",c:"n"},{v:"来<span style='font-size:6.3pt'>（き）</span>ながら・来<span style='font-size:6.3pt'>（き）</span>方",c:"n"}],
+ [{v:"<b>V2</b><br><span style='font-size:6.6pt'>音便</span>",c:"k"},{v:"＋<b>て／た</b>（1類要音便）<br><span style='font-size:6.3pt'>＋たら／たり 也在這裡</span>",c:"n"},{v:`${C(G1,"te")}／${C(G1,"ta")}<br>${C(G1,"tara")}／${C(G1,"tari")}`,c:"n"},{v:`${C(G2,"te")}／${C(G2,"ta")}<br>${C(G2,"tara")}／${C(G2,"tari")}`,c:"n"},{v:`${S("te")}／${S("ta")}<br>${S("tara")}／${S("tari")}`,c:"n"},{v:`${K("te")}／${K("ta")}<br>${K("tara")}`,c:"n"}],
+ [{v:"<b>V3</b>",c:"k"},{v:"<b>單獨＝辭書形</b>（常體句尾）<br>＋<b>名詞</b>（連體修飾：飲む人）<br>＋<b>な</b>(禁止)／<b>前に</b>／<b>ことができる</b>／<b>つもり</b>／<b>と</b>",c:"n"},{v:`${C(G1,"kinshi")}<br>書く人・書く前に`,c:"n"},{v:`${C(G2,"kinshi")}<br>食べる人・食べる前に`,c:"n"},{v:`${S("kinshi")}<br>する人`,c:"n"},{v:`${K("kinshi")}<br>来る（くる）人`,c:"n"}],
+ [{v:"<b>V4</b>",c:"k"},{v:"＋<b>ば</b>（條件）",c:"n"},{v:C(G1,"conditional"),c:"n"},{v:C(G2,"conditional"),c:"n"},{v:S("conditional"),c:"n"},{v:K("conditional"),c:"n"}],
+ [{v:"<b>V4</b>",c:"k"},{v:"＋<b>る</b>（可能）<br><b>★2･3類不是這樣</b>：V1＋られる",c:"n"},{v:C(G1,"potential"),c:"n"},{v:`${C(G2,"potential")}<br><span style='font-size:6.3pt'>（＝V1＋られる）</span>`,c:"n"},{v:`${S("potential")}<br><span style='font-size:6.3pt'>完全不規則</span>`,c:"n"},{v:K("potential"),c:"n"}],
+ [{v:"<b>V4</b>",c:"k"},{v:"<b>單獨＝命令形</b><br>2類＋<b>ろ</b>　★3類不規則",c:"n"},{v:C(G1,"imperative"),c:"n"},{v:C(G2,"imperative"),c:"n"},{v:`${S("imperative")}<br><span style='font-size:6.3pt'>（せよ 也可）</span>`,c:"n"},{v:`${K("imperative")}<br><span style='font-size:6.3pt'>★不是 くれ</span>`,c:"n"}],
+ [{v:"<b>V5</b>",c:"k"},{v:"＋<b>う</b>（意向）<br>2･3類＋<b>よう</b>",c:"n"},{v:C(G1,"volitional"),c:"n"},{v:C(G2,"volitional"),c:"n"},{v:S("volitional"),c:"n"},{v:K("volitional"),c:"n"}]
+])}
+</div>
+
+<div class="blk"><h2>㉕ 背這張表的方法</h2>
+<div class="two">
+${table(["步驟","做什麼"],[
+ [{v:"<b>1</b>",c:"k"},{v:"先背 ㉓ 的<b>第1類三欄</b>（書か・書き・書く・書け・書こ），<b>出聲唸五次</b>。這是あいうえお的順序，很快。",c:"n"}],
+ [{v:"<b>2</b>",c:"k"},{v:"第2類<b>直接跳過</b>——只要記「去る」，五個語幹都一樣。",c:"n"}],
+ [{v:"<b>3</b>",c:"k"},{v:"来る 單獨背：<b>こ・き・くる・くれ・こ</b>（順序唸）。漢字一樣、讀音不同，一定要唸出來。",c:"n"}],
+ [{v:"<b>4</b>",c:"k"},{v:"再背 ㉔ 的<b>中欄</b>（哪個語幹接什麼），成品欄只用來對答案。",c:"n"}]
+])}
+${table(["只有 4 個真正的不規則","正確"],[
+ [{v:"する 的可能形",c:"n"},{v:`<b>${S("potential")}</b>（✗ すられる）`,c:"n"}],
+ [{v:"来る 的命令形",c:"n"},{v:`<b>${K("imperative")}</b>（✗ 来れ）`,c:"n"}],
+ [{v:"する 的命令形",c:"n"},{v:`<b>${S("imperative")}</b>／せよ`,c:"n"}],
+ [{v:"1類 行く 的て形",c:"n"},{v:`<b>${C("行く","te")}</b>（✗ 行いて）`,c:"n"}],
+ [{v:"（半個）尾巴是う的 V1",c:"n"},{v:"買<b>わ</b>ない（✗ 買あない）",c:"n"}]
+])}
+</div>
+<div class="warn"><span class="lb">為什麼值得背</span>把 V1〜V5 背起來之後，<b>看到任何新句型只要問一句「它接哪個語幹」</b>，就能自己推出變化，不必再一個一個查。
+　例：學到「〜ずに」→ 查到是接 V1 → 書か<b>ずに</b>／食べ<b>ずに</b>／<b>せずに</b>（する是特例）。</div>
+</div>
+`;
+
 // ── 輸出 ───────────────────────────────────────────────
 const html = `<!doctype html><html lang="zh-TW"><head><meta charset="utf-8">`
  + `<title>N4 基礎講義</title><style>${CSS}</style></head><body>`
@@ -486,6 +560,7 @@ const html = `<!doctype html><html lang="zh-TW"><head><meta charset="utf-8">`
  + page(4, "自動詞・他動詞", "が／を 的選擇　＋　48 組常用對照表", P4)
  + page(5, "助詞", "は／が 的分辨　＋　助詞總表　＋　最常錯的三組", P5)
  + page(6, "敬語", "尊敬語／謙讓語／丁寧語　＋　兩條萬用公式　＋　特殊動詞表", P6)
+ + page(7, "V1〜V5 語幹背誦表", "五個語幹 × 三類　＋　哪個語幹接哪個尾巴（来る附讀音）", P7)
  + `</body></html>`;
 
 fs.mkdirSync(path.join(ROOT, "build"), { recursive: true });
