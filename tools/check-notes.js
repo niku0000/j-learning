@@ -6,7 +6,9 @@ const ROOT = path.join(__dirname, "..");
 
 // 每個資料檔 → 由哪一頁渲染、那一頁允許哪些標記
 const SPECS = [
-  { file: "questions.json", page: "questions.html", allow: ["b", "br", "u", "span class='zh'"] },
+  // questions.json 刻意只用 <b> / <br>：這樣即使使用者的瀏覽器快取了舊版
+  // questions.html，筆記一樣能正確顯示（questions.html 本身另外支援 u 與 span）
+  { file: "questions.json", page: "questions.html", allow: ["b", "br"] },
   { file: "grammar.json",   page: "grammar.html",   allow: ["b", "br", "span class='zh'"] },
   { file: "data.json",      page: "index.html",     allow: [] },   // index.html 全部跳脫
   { file: "progress.json",  page: "grammar.html",   allow: [] }
