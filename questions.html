@@ -104,6 +104,8 @@
   table.cmp th, table.cmp td { border: 1px solid var(--border); padding: 7px 9px; text-align: left; vertical-align: top; }
   table.cmp th { background: var(--accent-soft); font-weight: 700; white-space: nowrap; }
   table.cmp td:first-child { white-space: nowrap; }
+  table.cmp .zh { color: var(--muted); font-size: 0.94em; }
+  .a u, table.cmp u { text-decoration-thickness: 2px; text-underline-offset: 2px; }
   /* 說明裡的換行要保留 */
   .a, .background, .rules li, .examples li { white-space: pre-line; }
   body.work table.cmp th { background: #eee; }
@@ -166,8 +168,13 @@ function renderTags() {
   });
 }
 function esc(s){ return (s||"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
-// 資料裡刻意允許 <b> 與 <br> 當排版標記，跳脫後再還原這兩個
-function rich(s){ return esc(s).replace(/&lt;(\/?)b&gt;/g,"<$1b>").replace(/&lt;br\s*\/?&gt;/g,"<br>"); }
+// 資料裡刻意允許 <b> / <br> / <u> / <span class='zh'> 當作排版標記，這裡只還原這幾個
+function rich(s){ return esc(s)
+  .replace(/&lt;(\/?)b&gt;/g,"<$1b>")
+  .replace(/&lt;(\/?)u&gt;/g,"<$1u>")
+  .replace(/&lt;br\s*\/?&gt;/g,"<br>")
+  .replace(/&lt;span class='zh'&gt;/g,"<span class='zh'>")
+  .replace(/&lt;\/span&gt;/g,"</span>"); }
 function matches(e) {
   if (activeTag && !(e.tags||[]).includes(activeTag)) return false;
   if (!query) return true;
